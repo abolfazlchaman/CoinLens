@@ -14,10 +14,6 @@ function App() {
       )
       .then((res) => {
         setCoins(res.data);
-<<<<<<< HEAD
-=======
-        // console.log(res.data);
->>>>>>> fa467e617595de1d6b677821f1b5098408242c93
       })
       .catch((error) => console.log(error));
   }, []);
