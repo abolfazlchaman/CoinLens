@@ -58,6 +58,8 @@
 
 .coin-marketcap {
   width: 230px;
+  margin-left: 3rem;
+  text-align: start;
 }
 
 .coin-percent {
