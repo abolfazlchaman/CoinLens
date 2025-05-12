@@ -1,6 +1,6 @@
-# Crypto Man Backend
+# CoinLens Backend
 
-A Node.js/Express backend service for the Crypto Man application that handles CoinGecko API integration with Redis caching.
+A Node.js/Express backend service for the CoinLens application that handles CoinGecko API integration with Redis caching.
 
 ## Features
 

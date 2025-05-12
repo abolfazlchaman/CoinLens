@@ -1,4 +1,4 @@
-# UltraDeal
+# CoinLens
 
 A modern cryptocurrency tracking application built with React, TypeScript, and Tailwind CSS.
 

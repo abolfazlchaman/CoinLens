@@ -1,4 +1,4 @@
-# Crypto Man
+# CoinLens
 
 A modern cryptocurrency tracking application with real-time data from CoinGecko API.
 
