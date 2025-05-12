@@ -10,14 +10,11 @@ interface NewsItem {
   url: string;
   published_at: string;
   source: string;
+  description: string;
   image_url?: string;
 }
 
 const unsplashImages = [
-  'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
-  'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
-  'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
-  'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
   'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
   'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
   'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
@@ -32,7 +29,7 @@ function CryptoNews() {
     const fetchNews = async () => {
       try {
         const data = await cryptoApi.getNews();
-        setNews(data);
+        setNews(data.slice(0, 3)); // Only show 3 news items
       } catch (err) {
         setError('Failed to fetch news');
         console.error(err);
@@ -57,27 +54,42 @@ function CryptoNews() {
   }
 
   return (
-    <div className='w-full bg-muted/50 py-8'>
+    <div className='w-full bg-muted/50 py-16'>
       <div className='container mx-auto px-4'>
-        <div className='space-y-4'>
-          <h2 className='text-2xl font-bold'>Latest Crypto News</h2>
+        <div className='space-y-8'>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-3xl font-bold'>Latest Crypto News</h2>
+            <a
+              href='https://www.coingecko.com/en/news'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+              <span>View all news</span>
+              <ExternalLink className='h-4 w-4' />
+            </a>
+          </div>
 
-          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-            {news.slice(0, 6).map((item) => (
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-2'>
+            {news.map((item, index) => (
               <a
                 key={item.id}
                 href={item.url}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='group relative overflow-hidden rounded-lg bg-card p-4 transition-all hover:shadow-lg'>
-                <div className='space-y-2'>
-                  <div className='flex items-start justify-between'>
-                    <h3 className='line-clamp-2 text-sm font-medium'>{item.title}</h3>
-                    <ExternalLink className='ml-2 h-4 w-4 flex-shrink-0 text-muted-foreground' />
-                  </div>
-                  <div className='flex items-center justify-between text-xs text-muted-foreground'>
-                    <span>{item.source}</span>
+                className='group relative overflow-hidden rounded-lg bg-card transition-all hover:shadow-lg'>
+                <div className='aspect-video w-full overflow-hidden'>
+                  <img
+                    src={unsplashImages[index % unsplashImages.length]}
+                    alt={item.title}
+                    className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-105'
+                  />
+                </div>
+                <div className='p-4'>
+                  <h3 className='mb-2 line-clamp-2 font-medium'>{item.title}</h3>
+                  <p className='line-clamp-2 text-sm text-muted-foreground'>{item.description}</p>
+                  <div className='mt-4 flex items-center justify-between text-sm text-muted-foreground'>
                     <span>{new Date(item.published_at).toLocaleDateString()}</span>
+                    <span>{item.source}</span>
                   </div>
                 </div>
               </a>
