@@ -1,40 +1,62 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
 
 const Footer: React.FC = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className='bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700'>
-      <div className='container mx-auto px-4 py-8'>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-          <div>
-            <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
-              About UltraDeal
-            </h3>
-            <p className='text-gray-600 dark:text-gray-300 text-sm'>
-              Your ultimate cryptocurrency tracking platform. Stay updated with real-time prices,
-              market trends, and comprehensive crypto analytics.
+    <footer className='bg-background border-t'>
+      <div className='container mx-auto px-4 py-12'>
+        <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-4'>
+          {/* Brand Section */}
+          <div className='space-y-4'>
+            <Link
+              to='/'
+              className='flex items-center space-x-2 text-2xl font-bold text-primary'>
+              <span>UltraDeal</span>
+            </Link>
+            <p className='text-sm text-muted-foreground'>
+              Your all-in-one platform for cryptocurrency market analysis, portfolio tracking, and
+              real-time alerts.
             </p>
+            <div className='flex gap-4'>
+              <a
+                href='https://github.com/yourusername/crypto-man'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-muted-foreground hover:text-primary transition-colors'>
+                <Github className='w-5 h-5' />
+              </a>
+              <a
+                href='https://twitter.com/yourusername'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-muted-foreground hover:text-primary transition-colors'>
+                <Twitter className='w-5 h-5' />
+              </a>
+              <a
+                href='https://linkedin.com/in/yourusername'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-muted-foreground hover:text-primary transition-colors'>
+                <Linkedin className='w-5 h-5' />
+              </a>
+            </div>
           </div>
-          <div>
-            <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
-              Quick Links
-            </h3>
+
+          {/* Market Data Links */}
+          <div className='space-y-4'>
+            <h3 className='text-sm font-semibold'>Market Data</h3>
             <ul className='space-y-2'>
               <li>
                 <a
-                  href='https://www.coingecko.com/en/api'
+                  href='https://www.coingecko.com/en/trending'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-blue-600 dark:text-blue-400 hover:underline text-sm'>
-                  CoinGecko API
-                </a>
-              </li>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/coins/trending'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-600 dark:text-blue-400 hover:underline text-sm'>
-                  Trending Coins
+                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+                  <span>Trending Coins</span>
+                  <ExternalLink className='h-4 w-4' />
                 </a>
               </li>
               <li>
@@ -42,22 +64,36 @@ const Footer: React.FC = () => {
                   href='https://www.coingecko.com/en/global'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-blue-600 dark:text-blue-400 hover:underline text-sm'>
-                  Global Stats
+                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+                  <span>Global Stats</span>
+                  <ExternalLink className='h-4 w-4' />
+                </a>
+              </li>
+              <li>
+                <a
+                  href='https://www.coingecko.com/en/exchanges'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+                  <span>Exchanges</span>
+                  <ExternalLink className='h-4 w-4' />
                 </a>
               </li>
             </ul>
           </div>
-          <div>
-            <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>Resources</h3>
+
+          {/* Resources */}
+          <div className='space-y-4'>
+            <h3 className='text-sm font-semibold'>Resources</h3>
             <ul className='space-y-2'>
               <li>
                 <a
                   href='https://www.coingecko.com/en/learn'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-blue-600 dark:text-blue-400 hover:underline text-sm'>
-                  Learn Crypto
+                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+                  <span>Learn Crypto</span>
+                  <ExternalLink className='h-4 w-4' />
                 </a>
               </li>
               <li>
@@ -65,8 +101,9 @@ const Footer: React.FC = () => {
                   href='https://www.coingecko.com/en/news'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-blue-600 dark:text-blue-400 hover:underline text-sm'>
-                  Crypto News
+                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+                  <span>Crypto News</span>
+                  <ExternalLink className='h-4 w-4' />
                 </a>
               </li>
               <li>
@@ -74,25 +111,60 @@ const Footer: React.FC = () => {
                   href='https://www.coingecko.com/en/glossary'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-blue-600 dark:text-blue-400 hover:underline text-sm'>
-                  Crypto Glossary
+                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
+                  <span>Glossary</span>
+                  <ExternalLink className='h-4 w-4' />
                 </a>
               </li>
             </ul>
           </div>
+
+          {/* Legal */}
+          <div className='space-y-4'>
+            <h3 className='text-sm font-semibold'>Legal</h3>
+            <ul className='space-y-2'>
+              <li>
+                <Link
+                  to='/privacy'
+                  className='text-sm text-muted-foreground hover:text-foreground'>
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to='/terms'
+                  className='text-sm text-muted-foreground hover:text-foreground'>
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to='/disclaimer'
+                  className='text-sm text-muted-foreground hover:text-foreground'>
+                  Disclaimer
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className='mt-8 pt-8 border-t border-gray-200 dark:border-gray-700'>
-          <p className='text-center text-gray-600 dark:text-gray-300 text-sm'>
+
+        {/* Bottom Section */}
+        <div className='mt-12 border-t pt-8 text-center text-sm text-muted-foreground'>
+          <p>© {currentYear} UltraDeal. All rights reserved.</p>
+          <p className='mt-2'>
             Powered by{' '}
             <a
               href='https://www.coingecko.com'
               target='_blank'
               rel='noopener noreferrer'
-              className='text-blue-600 dark:text-blue-400 hover:underline'>
+              className='text-primary hover:underline'>
               CoinGecko
             </a>
-            {' • '}
-            Data updates every 5 minutes
+            . Data updates every 5 minutes.
+          </p>
+          <p className='mt-2'>
+            Cryptocurrency data is provided for informational purposes only and should not be
+            considered as financial advice.
           </p>
         </div>
       </div>

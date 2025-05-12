@@ -140,11 +140,11 @@ export class CoinGeckoService {
             'Content-Type': 'application/json',
           },
         });
-        const data = response.data;
-        
-        // Cache the result
-        await this.setCachedData(cacheKey, data);
-        return data;
+      const data = response.data;
+      
+      // Cache the result
+      await this.setCachedData(cacheKey, data);
+      return data;
       } catch (apiError: any) {
         if (apiError.response?.status === 429) {
           logger.warn('Rate limit hit, using fallback data');
@@ -211,8 +211,8 @@ export class CoinGeckoService {
       });
       const price = response.data[coinId]?.usd;
       if (price) {
-        await this.setCachedData(cacheKey, price);
-        return price;
+      await this.setCachedData(cacheKey, price);
+      return price;
       }
       throw new Error(`Price not found for ${coinId}`);
     } catch (error) {
