@@ -1,19 +1,19 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
-interface ThemeProviderProps {
-  children: ReactNode;
+type ThemeProviderProps = {
+  children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
-}
+};
 
-interface ThemeProviderState {
+type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-}
+};
 
 const initialState: ThemeProviderState = {
   theme: 'system',
@@ -25,13 +25,12 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'crypto-man-theme',
+  storageKey = 'vite-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem(storageKey);
-    return (savedTheme as Theme) || defaultTheme;
-  });
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
+  );
 
   useEffect(() => {
     const root = window.document.documentElement;
