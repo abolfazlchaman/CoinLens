@@ -38,10 +38,7 @@ export default function Header() {
   };
 
   return (
-    <header
-      className={`fixed top-0 z-50 w-full transition-all duration-200 ${
-        isScrolled ? 'bg-background/80 backdrop-blur-lg' : 'bg-transparent'
-      }`}>
+    <header className='fixed top-0 z-50 w-full bg-background shadow-sm'>
       <nav className='container mx-auto px-4'>
         <div className='flex h-16 items-center justify-between'>
           <div className='flex items-center'>
@@ -71,11 +68,13 @@ export default function Header() {
               {theme === 'dark' ? <Sun className='h-5 w-5' /> : <Moon className='h-5 w-5' />}
             </button>
 
+            {/* Language Selection Button - Temporarily Disabled
             <button
               onClick={() => setLanguage(language === 'en' ? 'fa' : 'en')}
               className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
               <Globe className='h-5 w-5' />
             </button>
+            */}
 
             {/* Mobile Menu Button */}
             <button
@@ -88,13 +87,13 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className='md:hidden'>
-            <div className='space-y-1 px-2 pb-3 pt-2'>
+          <div className='fixed inset-0 top-16 z-50 bg-background md:hidden'>
+            <div className='flex h-full flex-col space-y-4 p-4'>
               {navigation.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
-                  className='block w-full rounded-lg px-3 py-2 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
+                  className='w-full rounded-lg px-4 py-3 text-lg font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
                   {item.name}
                 </button>
               ))}

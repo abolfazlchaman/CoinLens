@@ -3,38 +3,47 @@ import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <div className='relative isolate overflow-hidden bg-muted/50'>
-      <div className='mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40'>
-        <div className='mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8'>
-          <h1 className='mt-10 text-4xl font-bold tracking-tight sm:text-6xl'>
-            Your Ultimate Crypto Companion
-          </h1>
-          <p className='mt-6 text-lg leading-8 text-muted-foreground'>
-            Stay ahead of the market with real-time data, personalized alerts, and comprehensive
-            analysis. Track your portfolio, monitor market trends, and make informed decisions.
-          </p>
-          <div className='mt-10 flex items-center gap-x-6'>
-            <Link
-              to='#market-trends'
-              className='rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'>
-              Get Started
-              <ArrowRight className='ml-2 -mr-1 h-4 w-4 inline-block' />
-            </Link>
-            <Link
-              to='#crypto-news'
-              className='text-sm font-semibold leading-6 text-foreground hover:text-primary'>
-              Learn more <span aria-hidden='true'>→</span>
-            </Link>
-          </div>
+    <div className='relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-background to-muted'>
+      {/* Background Pattern */}
+      <div className='absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]' />
+
+      {/* Content */}
+      <div className='container relative mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-32 text-center'>
+        <h1 className='mb-6 text-4xl font-bold tracking-tight sm:text-6xl'>
+          Your Ultimate{' '}
+          <span className='bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent'>
+            Crypto Companion
+          </span>
+        </h1>
+
+        <p className='mb-8 max-w-2xl text-lg text-muted-foreground sm:text-xl'>
+          Access{' '}
+          <span className='font-semibold text-primary'>free and real-time accurate data</span> for
+          all your cryptocurrency needs. Track market trends, manage your portfolio, and stay
+          informed with the latest crypto news.
+        </p>
+
+        <div className='flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0'>
+          <Link
+            to='/market-trends'
+            className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
+            Get Started
+            <ArrowRight className='ml-2 h-4 w-4' />
+          </Link>
+          <Link
+            to='/learn'
+            className='inline-flex items-center justify-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground'>
+            Learn More
+          </Link>
         </div>
-        <div className='mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32'>
-          <div className='max-w-3xl flex-none sm:max-w-5xl lg:max-w-none'>
-            <img
-              src='https://images.unsplash.com/photo-1518546305927-5a555bb7020d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80'
-              alt='Crypto trading dashboard'
-              className='w-[76rem] rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10'
-            />
-          </div>
+
+        {/* Dashboard Preview */}
+        <div className='mt-16 w-full max-w-5xl overflow-hidden rounded-lg border bg-card shadow-lg'>
+          <img
+            src='https://images.unsplash.com/photo-1518546305927-5a555bb7020d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80'
+            alt='Crypto trading dashboard'
+            className='w-full'
+          />
         </div>
       </div>
     </div>

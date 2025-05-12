@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface MarketData {
   id: string;
@@ -43,6 +44,18 @@ export default function MarketHeatmap() {
     return <div className='flex h-96 items-center justify-center text-destructive'>{error}</div>;
   }
 
+  const getPriceChangeColor = (change: number) => {
+    if (change > 0) return 'bg-green-500/10 text-green-500';
+    if (change < 0) return 'bg-red-500/10 text-red-500';
+    return 'bg-gray-500/10 text-gray-500';
+  };
+
+  const getPriceChangeIcon = (change: number) => {
+    if (change > 0) return <TrendingUp className='h-4 w-4' />;
+    if (change < 0) return <TrendingDown className='h-4 w-4' />;
+    return <Minus className='h-4 w-4' />;
+  };
+
   return (
     <div className='w-full bg-muted/50 py-16'>
       <div className='container mx-auto px-4'>
@@ -52,28 +65,20 @@ export default function MarketHeatmap() {
           <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'>
             {marketData.map((coin) => {
               const priceChange = coin.price_change_percentage_24h;
-              const isPositive = priceChange > 0;
-              const isNegative = priceChange < 0;
+              const colorClass = getPriceChangeColor(priceChange);
+              const icon = getPriceChangeIcon(priceChange);
 
               return (
                 <div
                   key={coin.id}
-                  className={`group relative overflow-hidden rounded-lg bg-card p-4 transition-all hover:shadow-lg ${
-                    isPositive ? 'hover:bg-green-500/10' : isNegative ? 'hover:bg-red-500/10' : ''
-                  }`}>
+                  className={`group relative overflow-hidden rounded-lg p-4 transition-all hover:shadow-lg ${colorClass}`}>
                   <div className='space-y-2'>
                     <div className='flex items-center justify-between'>
                       <span className='font-medium'>{coin.symbol.toUpperCase()}</span>
-                      <span
-                        className={`text-sm ${
-                          isPositive
-                            ? 'text-green-500'
-                            : isNegative
-                            ? 'text-red-500'
-                            : 'text-muted-foreground'
-                        }`}>
-                        {priceChange.toFixed(2)}%
-                      </span>
+                      <div className='flex items-center space-x-1'>
+                        {icon}
+                        <span className='text-sm'>{priceChange.toFixed(2)}%</span>
+                      </div>
                     </div>
                     <div className='text-sm text-muted-foreground'>
                       ${coin.current_price.toLocaleString()}
