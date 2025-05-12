@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThemeProvider } from 'next-themes';
+import { ThemeProvider } from './components/theme-provider';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -10,53 +10,34 @@ import Portfolio from './components/Portfolio';
 import PriceAlerts from './components/PriceAlerts';
 import MarketSentiment from './components/MarketSentiment';
 import MarketHeatmap from './components/MarketHeatmap';
+import { TopCryptos } from './components/TopCryptos';
 
 export default function App() {
   return (
     <ThemeProvider
-      attribute='class'
-      defaultTheme='system'
-      enableSystem>
+      defaultTheme='dark'
+      storageKey='vite-ui-theme'>
       <LanguageProvider>
         <div className='min-h-screen bg-background font-sans antialiased'>
           <Header />
-          <main>
+          <main className='container mx-auto px-4 py-8 space-y-8'>
             <Hero />
-            <section
-              id='news'
-              className='container py-8'>
-              <CryptoNews />
-            </section>
-            <section
-              id='exchanges'
-              className='container py-8'>
-              <Exchanges />
-            </section>
-            <section
-              id='market-trends'
-              className='container py-8'>
-              <MarketTrends />
-            </section>
-            <section
-              id='market-sentiment'
-              className='container py-8'>
-              <MarketSentiment />
-            </section>
-            <section
-              id='market-heatmap'
-              className='container py-8'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+              <TopCryptos />
               <MarketHeatmap />
-            </section>
-            <section
-              id='portfolio'
-              className='container py-8'>
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+              <MarketTrends />
+              <MarketSentiment />
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
               <Portfolio />
-            </section>
-            <section
-              id='price-alerts'
-              className='container py-8'>
               <PriceAlerts />
-            </section>
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+              <CryptoNews />
+              <Exchanges />
+            </div>
           </main>
         </div>
       </LanguageProvider>

@@ -1,13 +1,12 @@
+version: '3.8'
 
 services:
   frontend:
-    build:
-      context: ./Frontend
-      dockerfile: Dockerfile
+    build: ./Frontend
     ports:
-      - '3000:3000'
+      - '3000:80'
     environment:
-      - REACT_APP_API_BASE_URL=http://localhost:3001
+      - REACT_APP_API_BASE_URL=http://localhost:3001/api
     volumes:
       - ./Frontend:/app
       - /app/node_modules
@@ -15,13 +14,12 @@ services:
       - backend
 
   backend:
-    build:
-      context: ./Backend
-      dockerfile: Dockerfile
+    build: ./Backend
     ports:
       - '3001:3001'
     environment:
       - NODE_ENV=development
+      - PORT=3001
       - REDIS_URL=redis://redis:6379
     volumes:
       - ./Backend:/app
