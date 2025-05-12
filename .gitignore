@@ -11,6 +11,12 @@ package-lock.json
 
 # production
 /build
+*/node_modules
+*/node_modules/*
+Frontend/node_modules/*
+Frontend/node_modules
+Backend/node_modules/*
+Backend/node_modules
 
 # misc
 .DS_Store
