@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { cryptoApi } from '../services/api';
+import { useState, useEffect } from 'react';
+import { cryptoApi } from '../services/cryptoApi';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
-interface SentimentData {
+interface MarketSentiment {
   value: string;
   value_classification: string;
   timestamp: string;
@@ -9,7 +10,7 @@ interface SentimentData {
 }
 
 export default function MarketSentiment() {
-  const [sentiment, setSentiment] = useState<SentimentData | null>(null);
+  const [sentiment, setSentiment] = useState<MarketSentiment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,113 +19,92 @@ export default function MarketSentiment() {
       try {
         const data = await cryptoApi.getMarketSentiment();
         setSentiment(data);
-        setError(null);
-      } catch (error) {
-        console.error('Error fetching sentiment data:', error);
-        setError(error instanceof Error ? error.message : 'Failed to fetch sentiment data');
+      } catch (err) {
+        setError('Failed to fetch market sentiment data');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchSentiment();
-    const interval = setInterval(fetchSentiment, 60 * 60 * 1000); // Update every hour
-    return () => clearInterval(interval);
   }, []);
-
-  const getSentimentColor = (value: number) => {
-    if (value >= 75) return 'text-green-600 dark:text-green-400';
-    if (value >= 50) return 'text-yellow-600 dark:text-yellow-400';
-    if (value >= 25) return 'text-orange-600 dark:text-orange-400';
-    return 'text-red-600 dark:text-red-400';
-  };
-
-  const getSentimentEmoji = (value: number) => {
-    if (value >= 75) return '😄';
-    if (value >= 50) return '😊';
-    if (value >= 25) return '😐';
-    return '😢';
-  };
 
   if (loading) {
     return (
-      <div className='animate-pulse'>
-        <div className='h-8 bg-gray-200 dark:bg-gray-700 rounded mb-4'></div>
-        <div className='h-32 bg-gray-200 dark:bg-gray-700 rounded'></div>
+      <div className='flex h-96 items-center justify-center'>
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
       </div>
     );
   }
 
   if (error || !sentiment) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>
-          📊 Market Sentiment
-        </h2>
-        <p className='text-sm text-gray-500 dark:text-gray-400 text-center py-4'>
-          {error || 'Unable to fetch market sentiment data.'}
-        </p>
+      <div className='flex h-96 items-center justify-center text-destructive'>
+        {error || 'Failed to load market sentiment data'}
       </div>
     );
   }
 
   const sentimentValue = parseInt(sentiment.value);
+  const getSentimentColor = (value: number) => {
+    if (value >= 75) return 'text-green-500';
+    if (value >= 50) return 'text-yellow-500';
+    if (value >= 25) return 'text-orange-500';
+    return 'text-red-500';
+  };
+
+  const getSentimentIcon = (value: number) => {
+    if (value >= 75) return <TrendingUp className='h-4 w-4 text-green-500' />;
+    if (value >= 50) return <Minus className='h-4 w-4 text-yellow-500' />;
+    if (value >= 25) return <Minus className='h-4 w-4 text-orange-500' />;
+    return <TrendingDown className='h-4 w-4 text-red-500' />;
+  };
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>
-        📊 Market Sentiment
-      </h2>
-      <div className='space-y-4'>
-        <div className='flex items-center justify-between'>
-          <div>
-            <h3 className='text-sm font-medium text-gray-900 dark:text-white'>
-              Fear & Greed Index
-            </h3>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>
-              Last updated: {new Date(sentiment.timestamp).toLocaleString()}
-            </p>
-          </div>
-          <div className='text-3xl'>{getSentimentEmoji(sentimentValue)}</div>
-        </div>
-        <div className='relative pt-1'>
-          <div className='flex mb-2 items-center justify-between'>
-            <div>
-              <span
-                className={`text-xs font-semibold inline-block ${getSentimentColor(
-                  sentimentValue,
-                )}`}>
-                {sentiment.value_classification}
-              </span>
+    <div className='w-full bg-muted/50 py-16'>
+      <div className='container mx-auto px-4'>
+        <div className='space-y-8'>
+          <h2 className='text-3xl font-bold'>Market Sentiment</h2>
+
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='font-medium'>Fear & Greed Index</h3>
+                  <p className='text-sm text-muted-foreground'>
+                    Last updated: {new Date(sentiment.timestamp).toLocaleString()}
+                  </p>
+                </div>
+                {getSentimentIcon(sentimentValue)}
+              </div>
+
+              <div className='mt-4 space-y-2'>
+                <div className='flex items-center justify-between text-sm'>
+                  <span className='text-muted-foreground'>Value</span>
+                  <span className={getSentimentColor(sentimentValue)}>{sentiment.value}</span>
+                </div>
+                <div className='flex items-center justify-between text-sm'>
+                  <span className='text-muted-foreground'>Classification</span>
+                  <span className={getSentimentColor(sentimentValue)}>
+                    {sentiment.value_classification}
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-sm'>
+                  <span className='text-muted-foreground'>Next Update</span>
+                  <span>{sentiment.time_until_update}</span>
+                </div>
+              </div>
+
+              <div className='mt-4 text-xs text-muted-foreground'>
+                <p>
+                  The Fear & Greed Index measures market sentiment on a scale of 0-100. Extreme fear
+                  can indicate buying opportunities, while extreme greed suggests a potential market
+                  correction.
+                </p>
+              </div>
             </div>
-            <div className='text-right'>
-              <span className='text-xs font-semibold inline-block text-gray-600 dark:text-gray-400'>
-                {sentiment.value}
-              </span>
-            </div>
           </div>
-          <div className='overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 dark:bg-gray-700'>
-            <div
-              style={{ width: `${sentiment.value}%` }}
-              className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
-                sentimentValue >= 75
-                  ? 'bg-green-500'
-                  : sentimentValue >= 50
-                  ? 'bg-yellow-500'
-                  : sentimentValue >= 25
-                  ? 'bg-orange-500'
-                  : 'bg-red-500'
-              }`}
-            />
-          </div>
-        </div>
-        <div className='text-xs text-gray-500 dark:text-gray-400'>
-          <p>Next update in: {sentiment.time_until_update}</p>
-          <p className='mt-2'>
-            The Fear & Greed Index is a tool that measures market sentiment on a scale of 0-100.
-            Extreme fear can indicate that investors are too worried, which could be a buying
-            opportunity. Extreme greed suggests that the market is due for a correction.
-          </p>
         </div>
       </div>
     </div>

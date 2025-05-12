@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from './theme-provider';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ThemeToggle } from './ui/theme-toggle';
-import { LanguageToggle } from './ui/language-toggle';
-import { Button } from './ui/button';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { Menu, X, Sun, Moon, Globe } from 'lucide-react';
 
 const navigation = [
   { name: 'Market Trends', href: '#market-trends' },
@@ -20,8 +16,9 @@ const navigation = [
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  useTheme();
-  useLanguage();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,73 +29,78 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
+  const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      setIsMobileMenuOpen(false);
     }
   };
 
   return (
     <header
       className={`fixed top-0 z-50 w-full transition-all duration-200 ${
-        isScrolled ? 'bg-background/80 backdrop-blur-lg shadow-sm' : 'bg-transparent'
+        isScrolled ? 'bg-background/80 backdrop-blur-lg' : 'bg-transparent'
       }`}>
-      <nav className='container mx-auto px-4 py-4'>
-        <div className='flex items-center justify-between'>
-          <Link
-            to='/'
-            className='flex items-center space-x-2 text-2xl font-bold text-primary'>
-            <span>UltraDeal</span>
-          </Link>
+      <nav className='container mx-auto px-4'>
+        <div className='flex h-16 items-center justify-between'>
+          <div className='flex items-center'>
+            <Link
+              to='/'
+              className='text-2xl font-bold'>
+              UltraDeal
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className='hidden md:flex md:items-center md:space-x-8'>
             {navigation.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href={item.href}
-                onClick={(e) => scrollToSection(e, item.href)}
-                className='text-sm font-medium text-foreground/80 transition-colors hover:text-foreground'>
+                onClick={() => scrollToSection(item.href)}
+                className='text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'>
                 {item.name}
-              </a>
+              </button>
             ))}
           </div>
 
           <div className='flex items-center space-x-4'>
-            <ThemeToggle />
-            <LanguageToggle />
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
+              {theme === 'dark' ? <Sun className='h-5 w-5' /> : <Moon className='h-5 w-5' />}
+            </button>
 
-            {/* Mobile Navigation */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='md:hidden'>
-                  <Menu className='h-6 w-6' />
-                  <span className='sr-only'>Toggle menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side='right'
-                className='w-[300px] sm:w-[400px]'>
-                <nav className='flex flex-col space-y-4'>
-                  {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      onClick={(e) => scrollToSection(e, item.href)}
-                      className='text-sm font-medium text-foreground/80 transition-colors hover:text-foreground'>
-                      {item.name}
-                    </a>
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'fa' : 'en')}
+              className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
+              <Globe className='h-5 w-5' />
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden'>
+              {isMobileMenuOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className='md:hidden'>
+            <div className='space-y-1 px-2 pb-3 pt-2'>
+              {navigation.map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => scrollToSection(item.href)}
+                  className='block w-full rounded-lg px-3 py-2 text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
+                  {item.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );

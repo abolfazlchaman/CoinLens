@@ -3,9 +3,9 @@ import { useCryptoData } from '../hooks/useCryptoData';
 import SearchBar from './SearchBar';
 import SparklineChart from './SparklineChart';
 import SortDropdown, { SortOption } from './SortDropdown';
-import type { MarketData } from '../services/api';
+import type { MarketData } from '../services/cryptoApi';
 import RefreshButton from './RefreshButton';
-import { cryptoService } from '../services/cryptoService';
+import { cryptoApi } from '../services/cryptoApi';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -23,9 +23,8 @@ const formatPercentage = (num: number | undefined): string => {
   if (typeof num !== 'number') return 'N/A';
   return new Intl.NumberFormat('en-US', {
     style: 'percent',
-    signDisplay: 'always',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(num / 100);
 };
 
@@ -38,7 +37,7 @@ export function CryptoList() {
     isLoading,
     error,
     refetch,
-  } = useCryptoData<MarketData[]>('market-data', () => cryptoService.getMarketData());
+  } = useCryptoData<MarketData[]>('market-data', () => cryptoApi.getMarketData());
 
   const filteredAndSortedCryptos = useMemo(() => {
     const filtered =
@@ -86,33 +85,31 @@ export function CryptoList() {
   }
 
   if (!cryptos?.length) {
-    return null;
+    return (
+      <div className='rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg'>
+        <div className='text-gray-500 dark:text-gray-400'>No cryptocurrencies found</div>
+      </div>
+    );
   }
 
   return (
-    <div className='rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg'>
-      <div className='mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-        <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>Cryptocurrency List</h2>
-        <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-4'>
-          <SearchBar
-            value={searchTerm}
-            onChange={setSearchTerm}
-          />
-          <SortDropdown
-            value={sortOption}
-            onChange={setSortOption}
-          />
-          <RefreshButton
-            onClick={refetch}
-            isLoading={isLoading}
-          />
-        </div>
+    <div className='space-y-4'>
+      <div className='flex flex-col sm:flex-row gap-4'>
+        <SearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+        />
+        <SortDropdown
+          value={sortOption}
+          onChange={setSortOption}
+        />
+        <RefreshButton onClick={refetch} />
       </div>
       <div className='grid gap-4'>
         {filteredAndSortedCryptos.map((crypto) => (
           <div
             key={crypto.id}
-            className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700'>
+            className='rounded-lg bg-white dark:bg-gray-800 p-4 shadow-md hover:shadow-lg transition-shadow'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center space-x-4'>
                 <span className='text-sm text-gray-500 dark:text-gray-400 w-8'>

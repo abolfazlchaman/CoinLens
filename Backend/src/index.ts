@@ -7,6 +7,7 @@ import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { setupRedis } from './config/redis';
 import cryptoRoutes from './routes/crypto.routes';
+import portfolioRoutes from './routes/portfolio.routes';
 
 // Load environment variables
 dotenv.config();
@@ -16,7 +17,9 @@ const port = process.env.PORT || 3001;
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL 
+    : 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -37,6 +40,7 @@ app.use(limiter);
 
 // Routes
 app.use('/api', cryptoRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 // Error handling
 app.use(errorHandler);

@@ -1,4 +1,4 @@
-import type { MarketData, GlobalData, TrendingCoin, Exchange, NewsItem } from './coingecko.service';
+import type { MarketData, GlobalData, TrendingCoin, Exchange, NewsItem, CoinGeckoTrendingResponse } from './coingecko.service';
 
 export class FallbackService {
   private static instance: FallbackService;
@@ -84,35 +84,37 @@ export class FallbackService {
     };
   }
 
-  public async getTrendingCoins(): Promise<TrendingCoin[]> {
-    return [
-      {
-        item: {
-          id: 'bitcoin',
-          name: 'Bitcoin',
-          symbol: 'btc',
-          market_cap_rank: 1,
-          thumb: 'https://assets.coingecko.com/coins/images/1/thumb/bitcoin.png',
-          small: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
-          large: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
-          price_btc: 1,
-          score: 0,
+  public async getTrendingCoins(): Promise<CoinGeckoTrendingResponse> {
+    return {
+      coins: [
+        {
+          item: {
+            id: 'bitcoin',
+            name: 'Bitcoin',
+            symbol: 'btc',
+            market_cap_rank: 1,
+            thumb: 'https://assets.coingecko.com/coins/images/1/thumb/bitcoin.png',
+            small: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
+            large: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+            price_btc: 1,
+            score: 0,
+          },
         },
-      },
-      {
-        item: {
-          id: 'ethereum',
-          name: 'Ethereum',
-          symbol: 'eth',
-          market_cap_rank: 2,
-          thumb: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png',
-          small: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
-          large: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
-          price_btc: 0.06,
-          score: 1,
+        {
+          item: {
+            id: 'ethereum',
+            name: 'Ethereum',
+            symbol: 'eth',
+            market_cap_rank: 2,
+            thumb: 'https://assets.coingecko.com/coins/images/279/thumb/ethereum.png',
+            small: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+            large: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+            price_btc: 0.06,
+            score: 1,
+          },
         },
-      },
-    ];
+      ],
+    };
   }
 
   public async getCoinPrice(coinId: string): Promise<number> {

@@ -1,106 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { cryptoApi, GlobalData } from '../services/api';
+import { useState, useEffect } from 'react';
+import { cryptoApi, TrendingCoin } from '../services/cryptoApi';
+import { ExternalLink } from 'lucide-react';
+
+interface TrendingCoinItem {
+  id: string;
+  symbol: string;
+  name: string;
+  market_cap_rank: number;
+  thumb: string;
+  small: string;
+  large: string;
+  price_btc: number;
+  score: number;
+}
 
 export default function MarketTrends() {
-  const [marketData, setMarketData] = useState<GlobalData | null>(null);
+  const [trendingCoins, setTrendingCoins] = useState<TrendingCoinItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMarketData = async () => {
+    const fetchTrendingCoins = async () => {
       try {
-        const data = await cryptoApi.getGlobalData();
-        setMarketData(data);
-        setError(null);
+        const data = await cryptoApi.getTrendingCoins();
+        // Extract the item property from each trending coin
+        const coins = data.map((coin) => coin.item);
+        // Ensure all required properties exist before setting state
+        const validCoins = coins.filter(
+          (coin): coin is TrendingCoinItem =>
+            coin &&
+            typeof coin.id === 'string' &&
+            typeof coin.symbol === 'string' &&
+            typeof coin.name === 'string' &&
+            typeof coin.market_cap_rank === 'number' &&
+            typeof coin.thumb === 'string' &&
+            typeof coin.small === 'string' &&
+            typeof coin.large === 'string' &&
+            typeof coin.price_btc === 'number' &&
+            typeof coin.score === 'number',
+        );
+        setTrendingCoins(validCoins);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError('Failed to fetch trending coins');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMarketData();
-    const interval = setInterval(fetchMarketData, 5 * 60 * 1000); // Update every 5 minutes
-    return () => clearInterval(interval);
+    fetchTrendingCoins();
   }, []);
-
-  const formatNumber = (num: number) => {
-    if (num >= 1e12) return `${(num / 1e12).toFixed(2)}T`;
-    if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
-    if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
-    return num.toLocaleString();
-  };
 
   if (loading) {
     return (
-      <div className='animate-pulse'>
-        <div className='h-8 bg-gray-200 dark:bg-gray-700 rounded mb-4'></div>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className='h-24 bg-gray-200 dark:bg-gray-700 rounded'></div>
-          ))}
-        </div>
+      <div className='flex h-96 items-center justify-center'>
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
       </div>
     );
   }
 
-  if (error || !marketData) {
+  if (error) {
+    return <div className='flex h-96 items-center justify-center text-destructive'>{error}</div>;
+  }
+
+  if (!trendingCoins.length) {
     return (
-      <div className='text-center py-8'>
-        <p className='text-red-500 dark:text-red-400'>{error || 'Failed to load market data'}</p>
+      <div className='flex h-96 items-center justify-center text-muted-foreground'>
+        No trending coins available
       </div>
     );
   }
 
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>📊 Market Trends</h2>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-            Total Market Cap
-          </h3>
-          <p className='text-2xl font-bold text-gray-900 dark:text-white'>
-            ${formatNumber(marketData.total_market_cap.usd)}
-          </p>
-          <div className='mt-2 flex items-center'>
-            <span
-              className={`text-sm ${
-                marketData.market_cap_change_percentage_24h_usd >= 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              }`}>
-              {marketData.market_cap_change_percentage_24h_usd >= 0 ? '+' : ''}
-              {marketData.market_cap_change_percentage_24h_usd.toFixed(2)}%
-            </span>
-            <span className='text-xs text-gray-500 dark:text-gray-400 ml-2'>24h change</span>
+    <div className='w-full bg-muted/50 py-16'>
+      <div className='container mx-auto px-4'>
+        <div className='space-y-8'>
+          <h2 className='text-3xl font-bold'>Trending Coins</h2>
+
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            {trendingCoins.map((coin) => (
+              <div
+                key={coin.id}
+                className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center space-x-4'>
+                    <img
+                      src={coin.thumb}
+                      alt={coin.name}
+                      className='h-10 w-10 rounded-full'
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder-coin.png';
+                      }}
+                    />
+                    <div>
+                      <h3 className='font-medium'>{coin.name}</h3>
+                      <p className='text-sm text-muted-foreground'>{coin.symbol.toUpperCase()}</p>
+                    </div>
+                  </div>
+                  <span className='text-sm text-muted-foreground'>#{coin.market_cap_rank}</span>
+                </div>
+
+                <div className='mt-4 space-y-2'>
+                  <div className='flex items-center justify-between text-sm'>
+                    <span className='text-muted-foreground'>Price (BTC)</span>
+                    <span>{coin.price_btc.toFixed(8)}</span>
+                  </div>
+                  <div className='flex items-center justify-between text-sm'>
+                    <span className='text-muted-foreground'>Score</span>
+                    <span>{coin.score.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <a
+                  href={`https://www.coingecko.com/en/coins/${coin.id}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='absolute inset-0 z-10'>
+                  <span className='sr-only'>View {coin.name} on CoinGecko</span>
+                </a>
+                <ExternalLink className='absolute right-4 top-4 h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100' />
+              </div>
+            ))}
           </div>
-        </div>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-            24h Trading Volume
-          </h3>
-          <p className='text-2xl font-bold text-gray-900 dark:text-white'>
-            ${formatNumber(marketData.total_volume.usd)}
-          </p>
-        </div>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-            BTC Dominance
-          </h3>
-          <p className='text-2xl font-bold text-gray-900 dark:text-white'>
-            {marketData.market_cap_percentage.btc.toFixed(2)}%
-          </p>
-        </div>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400 mb-1'>
-            ETH Dominance
-          </h3>
-          <p className='text-2xl font-bold text-gray-900 dark:text-white'>
-            {marketData.market_cap_percentage.eth.toFixed(2)}%
-          </p>
         </div>
       </div>
     </div>

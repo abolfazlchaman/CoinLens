@@ -54,12 +54,8 @@ router.get('/trending-coins', async (req, res, next) => {
   try {
     console.log('Fetching trending coins...');
     const data = await coinGeckoService.getTrendingCoins();
-    // Flatten the item property
-    if (Array.isArray(data)) {
-      res.json(data.map((entry) => entry.item));
-    } else {
-      res.json([]);
-    }
+    // Return the full trending coins array
+    res.json(data);
   } catch (error) {
     console.error('Error fetching trending coins:', error);
     next(error);

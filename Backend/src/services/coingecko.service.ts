@@ -83,6 +83,22 @@ export interface MarketSentiment {
   time_until_update: string;
 }
 
+export interface CoinGeckoTrendingResponse {
+  coins: Array<{
+    item: {
+      id: string;
+      name: string;
+      symbol: string;
+      market_cap_rank: number;
+      thumb: string;
+      small: string;
+      large: string;
+      price_btc: number;
+      score: number;
+    };
+  }>;
+}
+
 export class CoinGeckoService {
   private static instance: CoinGeckoService;
 
@@ -182,11 +198,30 @@ export class CoinGeckoService {
   }
 
   async getTrendingCoins(): Promise<TrendingCoin[]> {
-    return this.fetchWithFallback(
+    const data = await this.fetchWithFallback<CoinGeckoTrendingResponse>(
       '/search/trending',
       'trending-coins',
       () => fallbackService.getTrendingCoins(),
     );
+    
+    // Transform the CoinGecko API response into our expected format
+    if (data && data.coins) {
+      return data.coins.map((coin) => ({
+        item: {
+          id: coin.item.id,
+          name: coin.item.name,
+          symbol: coin.item.symbol,
+          market_cap_rank: coin.item.market_cap_rank,
+          thumb: coin.item.thumb,
+          small: coin.item.small,
+          large: coin.item.large,
+          price_btc: coin.item.price_btc,
+          score: coin.item.score,
+        },
+      }));
+    }
+    
+    return [];
   }
 
   async getExchanges(): Promise<Exchange[]> {

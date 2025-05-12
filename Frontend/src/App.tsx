@@ -1,4 +1,4 @@
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from './components/theme-provider';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -11,23 +11,23 @@ import MarketSentiment from './components/MarketSentiment';
 import MarketHeatmap from './components/MarketHeatmap';
 import Footer from './components/Footer';
 
-function App() {
+export default function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider
+      defaultTheme='dark'
+      storageKey='crypto-man-theme'>
       <LanguageProvider>
-        <div className='min-h-screen bg-background text-foreground'>
+        <div className='min-h-screen bg-background font-sans antialiased'>
           <Header />
-          <main className='flex flex-col gap-8 px-4 py-8 md:px-8 lg:px-16'>
+          <main className='flex flex-col gap-16'>
             <Hero />
-            <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
-              <MarketTrends />
-              <Portfolio />
-              <PriceAlerts />
-              <MarketSentiment />
-              <MarketHeatmap />
-              <CryptoNews />
-              <Exchanges />
-            </div>
+            <MarketTrends />
+            <Portfolio />
+            <PriceAlerts />
+            <MarketSentiment />
+            <MarketHeatmap />
+            <CryptoNews />
+            <Exchanges />
           </main>
           <Footer />
         </div>
@@ -35,5 +35,3 @@ function App() {
     </ThemeProvider>
   );
 }
-
-export default App;

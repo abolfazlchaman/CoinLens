@@ -1,245 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import { cryptoApi } from '../services/api';
+import { useState, useEffect } from 'react';
+import { cryptoApi } from '../services/cryptoApi';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { LoadingSpinner } from './LoadingSpinner';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface PortfolioItem {
   id: string;
-  coinId: string;
-  coinName: string;
-  coinSymbol: string;
+  symbol: string;
+  name: string;
   amount: number;
   purchasePrice: number;
-  currentPrice: number;
+  purchaseDate: string;
 }
 
-export default function Portfolio() {
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
-  const [selectedCoin, setSelectedCoin] = useState('');
-  const [amount, setAmount] = useState('');
-  const [purchasePrice, setPurchasePrice] = useState('');
-  const [coins, setCoins] = useState<Array<{ id: string; name: string; symbol: string }>>([]);
+interface Portfolio {
+  items: PortfolioItem[];
+  totalValue: number;
+  totalProfitLoss: number;
+  totalProfitLossPercentage: number;
+}
+
+export function Portfolio() {
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
-  const [totalValue, setTotalValue] = useState(0);
-  const [totalProfit, setTotalProfit] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCoins = async () => {
+    const fetchPortfolio = async () => {
       try {
-        const data = await cryptoApi.getMarketData();
-        setCoins(
-          data.map((coin) => ({
-            id: coin.id,
-            name: coin.name,
-            symbol: coin.symbol,
-          })),
-        );
-      } catch (error) {
-        console.error('Error fetching coins:', error);
+        const data = await cryptoApi.getPortfolio();
+        setPortfolio(data);
+      } catch (err) {
+        setError('Failed to fetch portfolio data');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCoins();
+    fetchPortfolio();
   }, []);
-
-  useEffect(() => {
-    const updatePortfolioValues = async () => {
-      if (portfolio.length === 0) return;
-
-      try {
-        const updatedPortfolio = await Promise.all(
-          portfolio.map(async (item) => {
-            const price = await cryptoApi.getCoinPrice(item.coinId);
-            return {
-              ...item,
-              currentPrice: price || item.currentPrice,
-            };
-          }),
-        );
-
-        setPortfolio(updatedPortfolio);
-
-        const newTotalValue = updatedPortfolio.reduce(
-          (sum, item) => sum + item.amount * item.currentPrice,
-          0,
-        );
-        const newTotalProfit = updatedPortfolio.reduce(
-          (sum, item) => sum + item.amount * (item.currentPrice - item.purchasePrice),
-          0,
-        );
-
-        setTotalValue(newTotalValue);
-        setTotalProfit(newTotalProfit);
-      } catch (error) {
-        console.error('Error updating portfolio values:', error);
-      }
-    };
-
-    updatePortfolioValues();
-    const interval = setInterval(updatePortfolioValues, 5 * 60 * 1000); // Update every 5 minutes
-    return () => clearInterval(interval);
-  }, [portfolio]);
-
-  const handleAddToPortfolio = () => {
-    if (!selectedCoin || !amount || !purchasePrice) return;
-
-    const coin = coins.find((c) => c.id === selectedCoin);
-    if (!coin) return;
-
-    const newItem: PortfolioItem = {
-      id: Date.now().toString(),
-      coinId: coin.id,
-      coinName: coin.name,
-      coinSymbol: coin.symbol,
-      amount: parseFloat(amount),
-      purchasePrice: parseFloat(purchasePrice),
-      currentPrice: parseFloat(purchasePrice),
-    };
-
-    setPortfolio([...portfolio, newItem]);
-    setSelectedCoin('');
-    setAmount('');
-    setPurchasePrice('');
-  };
-
-  const handleRemoveFromPortfolio = (itemId: string) => {
-    setPortfolio(portfolio.filter((item) => item.id !== itemId));
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
 
   if (loading) {
     return (
-      <div className='animate-pulse'>
-        <div className='h-8 bg-gray-200 dark:bg-gray-700 rounded mb-4'></div>
-        <div className='space-y-4'>
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className='h-16 bg-gray-200 dark:bg-gray-700 rounded'></div>
-          ))}
+      <div className='w-full bg-muted/50 py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='flex h-96 items-center justify-center'>
+            <LoadingSpinner />
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col overflow-auto'>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>💼 Portfolio</h2>
-      <div className='space-y-4'>
-        <div className='flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'>
-          <select
-            value={selectedCoin}
-            onChange={(e) => setSelectedCoin(e.target.value)}
-            className='flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
-            <option value=''>Select a coin</option>
-            {coins.map((coin) => (
-              <option
-                key={coin.id}
-                value={coin.id}>
-                {coin.name} ({coin.symbol.toUpperCase()})
-              </option>
-            ))}
-          </select>
-          <input
-            type='number'
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder='Amount'
-            className='w-full sm:w-32 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-          <input
-            type='number'
-            value={purchasePrice}
-            onChange={(e) => setPurchasePrice(e.target.value)}
-            placeholder='Purchase price'
-            className='w-full sm:w-32 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-          <button
-            onClick={handleAddToPortfolio}
-            disabled={!selectedCoin || !amount || !purchasePrice}
-            className='w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed'>
-            Add to Portfolio
-          </button>
+  if (error) {
+    return (
+      <div className='w-full bg-muted/50 py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='flex h-96 items-center justify-center text-destructive'>{error}</div>
         </div>
-        <div className='space-y-2'>
-          {portfolio.map((item) => {
-            const profit = item.amount * (item.currentPrice - item.purchasePrice);
-            const profitPercentage =
-              ((item.currentPrice - item.purchasePrice) / item.purchasePrice) * 100;
+      </div>
+    );
+  }
 
-            return (
-              <div
-                key={item.id}
-                className='flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700'>
-                <div>
-                  <h3 className='text-sm font-medium text-gray-900 dark:text-white'>
-                    {item.coinName} ({item.coinSymbol.toUpperCase()})
-                  </h3>
-                  <p className='text-xs text-gray-500 dark:text-gray-400'>
-                    {item.amount} coins @ {formatCurrency(item.purchasePrice)}
-                  </p>
-                </div>
-                <div className='text-right'>
-                  <div className='text-sm font-medium text-gray-900 dark:text-white'>
-                    {formatCurrency(item.amount * item.currentPrice)}
-                  </div>
-                  <div
-                    className={`text-xs ${
-                      profit >= 0
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
-                    {profit >= 0 ? '+' : ''}
-                    {formatCurrency(profit)} ({profitPercentage.toFixed(2)}%)
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleRemoveFromPortfolio(item.id)}
-                  className='ml-4 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'>
-                  Remove
-                </button>
-              </div>
-            );
-          })}
-          {portfolio.length === 0 && (
-            <p className='text-sm text-gray-500 dark:text-gray-400 text-center py-4'>
-              No coins in your portfolio. Add some above to start tracking.
-            </p>
-          )}
+  if (!portfolio) {
+    return (
+      <div className='w-full bg-muted/50 py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='flex h-96 items-center justify-center text-muted-foreground'>
+            No portfolio data available
+          </div>
         </div>
-        {portfolio.length > 0 && (
-          <div className='pt-4 mt-4 border-t border-gray-200 dark:border-gray-700'>
-            <div className='flex items-center justify-between'>
-              <span className='text-sm font-medium text-gray-900 dark:text-white'>Total Value</span>
-              <span className='text-sm font-medium text-gray-900 dark:text-white'>
-                {formatCurrency(totalValue)}
-              </span>
-            </div>
-            <div className='flex items-center justify-between mt-2'>
-              <span className='text-sm font-medium text-gray-900 dark:text-white'>
-                Total Profit/Loss
-              </span>
-              <span
-                className={`text-sm font-medium ${
-                  totalProfit >= 0
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
+      </div>
+    );
+  }
+
+  const getPriceChangeIcon = (change: number) => {
+    if (change > 0) return <TrendingUp className='h-4 w-4 text-green-500' />;
+    if (change < 0) return <TrendingDown className='h-4 w-4 text-red-500' />;
+    return <Minus className='h-4 w-4 text-muted-foreground' />;
+  };
+
+  return (
+    <div className='w-full bg-muted/50 py-16'>
+      <div className='container mx-auto px-4'>
+        <div className='space-y-8'>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-3xl font-bold'>Portfolio</h2>
+            <div className='text-right'>
+              <p className='text-sm text-muted-foreground'>Total Value</p>
+              <p className='text-2xl font-bold'>${portfolio.totalValue.toLocaleString()}</p>
+              <p
+                className={`text-sm ${
+                  portfolio.totalProfitLoss >= 0 ? 'text-green-500' : 'text-red-500'
                 }`}>
-                {totalProfit >= 0 ? '+' : ''}
-                {formatCurrency(totalProfit)}
-              </span>
+                {portfolio.totalProfitLoss >= 0 ? '+' : ''}
+                {portfolio.totalProfitLoss.toLocaleString()} (
+                {portfolio.totalProfitLossPercentage.toFixed(2)}%)
+              </p>
             </div>
           </div>
-        )}
+
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            {portfolio.items.map((item) => {
+              const profitLoss = item.amount * (item.purchasePrice - item.purchasePrice);
+              const profitLossPercentage = (profitLoss / (item.amount * item.purchasePrice)) * 100;
+
+              return (
+                <div
+                  key={item.id}
+                  className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center space-x-4'>
+                      <div className='h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                        <span className='text-lg font-medium'>{item.symbol.toUpperCase()}</span>
+                      </div>
+                      <div>
+                        <h3 className='font-medium'>{item.name}</h3>
+                        <p className='text-sm text-muted-foreground'>{item.symbol.toUpperCase()}</p>
+                      </div>
+                    </div>
+                    {getPriceChangeIcon(profitLoss)}
+                  </div>
+
+                  <div className='mt-4 space-y-2'>
+                    <div className='flex items-center justify-between text-sm'>
+                      <span className='text-muted-foreground'>Amount</span>
+                      <span>{item.amount.toLocaleString()}</span>
+                    </div>
+                    <div className='flex items-center justify-between text-sm'>
+                      <span className='text-muted-foreground'>Purchase Price</span>
+                      <span>${item.purchasePrice.toLocaleString()}</span>
+                    </div>
+                    <div className='flex items-center justify-between text-sm'>
+                      <span className='text-muted-foreground'>Purchase Date</span>
+                      <span>{new Date(item.purchaseDate).toLocaleDateString()}</span>
+                    </div>
+                    <div className='flex items-center justify-between text-sm'>
+                      <span className='text-muted-foreground'>Profit/Loss</span>
+                      <span className={profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}>
+                        {profitLoss >= 0 ? '+' : ''}
+                        {profitLoss.toLocaleString()} ({profitLossPercentage.toFixed(2)}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
+  );
+}
+
+export default function PortfolioWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <Portfolio />
+    </ErrorBoundary>
   );
 }

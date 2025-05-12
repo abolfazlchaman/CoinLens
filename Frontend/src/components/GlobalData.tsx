@@ -1,115 +1,148 @@
-import React from 'react';
-import type { GlobalData } from '../services/api';
-import { useCryptoData } from '../hooks/useCryptoData';
-import { cryptoService } from '../services/cryptoService';
-import { ErrorBoundary } from './ErrorBoundary';
+import React, { useState, useEffect } from 'react';
+import { cryptoApi } from '../services/cryptoApi';
+import type { GlobalData as GlobalDataType } from '../services/cryptoApi';
 import { LoadingSpinner } from './LoadingSpinner';
-
-const formatNumber = (num: number | undefined): string => {
-  if (typeof num !== 'number') return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(num);
-};
-
-const formatPercentage = (num: number | undefined): string => {
-  if (typeof num !== 'number') return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'percent',
-    signDisplay: 'always',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(num / 100);
-};
+import { ErrorBoundary } from './ErrorBoundary';
 
 export function GlobalData() {
-  const {
-    data: globalData,
-    isLoading,
-    error,
-  } = useCryptoData<GlobalData>('global-data', () => cryptoService.getGlobalData());
+  const [globalData, setGlobalData] = useState<GlobalDataType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (isLoading) {
+  useEffect(() => {
+    const fetchGlobalData = async () => {
+      try {
+        setLoading(true);
+        const data = await cryptoApi.getGlobalData();
+        setGlobalData(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching global data:', err);
+        setError('Failed to fetch global data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGlobalData();
+  }, []);
+
+  if (loading) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <LoadingSpinner />
+      <div className='w-full bg-muted/50 py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='flex h-96 items-center justify-center'>
+            <LoadingSpinner />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <div className='text-red-500 dark:text-red-400'>{error.message}</div>
+      <div className='w-full bg-muted/50 py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='flex h-96 items-center justify-center text-destructive'>{error}</div>
+        </div>
       </div>
     );
   }
 
   if (!globalData) {
-    return null;
-  }
-
-  const totalMarketCap = globalData.total_market_cap.usd;
-  const totalVolume = globalData.total_volume.usd;
-  const marketCapChange = globalData.market_cap_change_percentage_24h_usd;
-
-  return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>Market Overview</h2>
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Total Market Cap</h3>
-          <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-            {formatNumber(totalMarketCap)}
-          </p>
-        </div>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>24h Volume</h3>
-          <p className='text-2xl font-bold text-gray-900 dark:text-white mt-1'>
-            {formatNumber(totalVolume)}
-          </p>
-        </div>
-        <div className='p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>24h Change</h3>
-          <p
-            className={`text-2xl font-bold mt-1 ${
-              marketCapChange >= 0
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-            }`}>
-            {formatPercentage(marketCapChange)}
-          </p>
+    return (
+      <div className='w-full bg-muted/50 py-16'>
+        <div className='container mx-auto px-4'>
+          <div className='flex h-96 items-center justify-center text-muted-foreground'>
+            No global data available
+          </div>
         </div>
       </div>
-      <div className='mt-4 grid grid-cols-2 md:grid-cols-4 gap-4'>
-        <div className='p-3 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>
-            Active Cryptocurrencies
-          </h3>
-          <p className='text-lg font-semibold text-gray-900 dark:text-white mt-1'>
-            {globalData.active_cryptocurrencies.toLocaleString()}
-          </p>
-        </div>
-        <div className='p-3 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Markets</h3>
-          <p className='text-lg font-semibold text-gray-900 dark:text-white mt-1'>
-            {globalData.markets.toLocaleString()}
-          </p>
-        </div>
-        <div className='p-3 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Ongoing ICOs</h3>
-          <p className='text-lg font-semibold text-gray-900 dark:text-white mt-1'>
-            {globalData.ongoing_icos}
-          </p>
-        </div>
-        <div className='p-3 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-          <h3 className='text-sm font-medium text-gray-500 dark:text-gray-400'>Upcoming ICOs</h3>
-          <p className='text-lg font-semibold text-gray-900 dark:text-white mt-1'>
-            {globalData.upcoming_icos}
-          </p>
+    );
+  }
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      notation: 'compact',
+      maximumFractionDigits: 2,
+    }).format(num);
+  };
+
+  const formatPercentage = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'percent',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(num / 100);
+  };
+
+  return (
+    <div className='w-full bg-muted/50 py-16'>
+      <div className='container mx-auto px-4'>
+        <div className='space-y-8'>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-3xl font-bold'>Global Market Data</h2>
+            <div className='text-right'>
+              <p className='text-sm text-muted-foreground'>24h Change</p>
+              <p
+                className={`text-2xl font-bold ${
+                  globalData.data.market_cap_change_percentage_24h_usd >= 0
+                    ? 'text-green-500'
+                    : 'text-red-500'
+                }`}>
+                {globalData.data.market_cap_change_percentage_24h_usd >= 0 ? '+' : ''}
+                {formatPercentage(globalData.data.market_cap_change_percentage_24h_usd)}
+              </p>
+            </div>
+          </div>
+
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='text-sm font-medium text-muted-foreground'>Total Market Cap</h3>
+                  <p className='mt-2 text-2xl font-bold'>
+                    {formatNumber(globalData.data.total_market_cap.usd)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='text-sm font-medium text-muted-foreground'>24h Volume</h3>
+                  <p className='mt-2 text-2xl font-bold'>
+                    {formatNumber(globalData.data.total_volume.usd)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='text-sm font-medium text-muted-foreground'>BTC Dominance</h3>
+                  <p className='mt-2 text-2xl font-bold'>
+                    {formatPercentage(globalData.data.market_cap_percentage.btc)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='text-sm font-medium text-muted-foreground'>ETH Dominance</h3>
+                  <p className='mt-2 text-2xl font-bold'>
+                    {formatPercentage(globalData.data.market_cap_percentage.eth)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

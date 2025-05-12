@@ -1,51 +1,42 @@
-import React from 'react';
-import { Button } from './ui/button';
-import { ArrowDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
-const Hero: React.FC = () => {
-  const scrollToContent = () => {
-    const element = document.getElementById('content');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
+export default function Hero() {
   return (
-    <div
-      className='relative h-[60vh] min-h-[400px] w-full overflow-hidden'
-      style={{
-        backgroundImage:
-          'url("https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=2069&auto=format&fit=crop")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}>
-      <div className='absolute inset-0 bg-black/50' />
-      <div className='relative h-full flex flex-col items-center justify-center text-center px-4'>
-        <h1 className='text-4xl md:text-6xl font-bold text-white mb-4'>
-          <span className='font-display'>UltraDeal</span>
-        </h1>
-        <p className='text-xl md:text-2xl text-white/90 mb-8 max-w-2xl'>
-          Your free, real-time cryptocurrency dashboard. Stay updated with the latest market trends,
-          news, and insights.
-        </p>
-        <div className='flex flex-col sm:flex-row gap-4'>
-          <Button
-            size='lg'
-            onClick={scrollToContent}
-            className='bg-white text-black hover:bg-white/90'>
-            Explore Dashboard
-            <ArrowDown className='ml-2 h-4 w-4' />
-          </Button>
-          <Button
-            size='lg'
-            variant='outline'
-            className='text-white border-white hover:bg-white/10'>
-            Learn More
-          </Button>
+    <div className='relative isolate overflow-hidden bg-muted/50'>
+      <div className='mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40'>
+        <div className='mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8'>
+          <h1 className='mt-10 text-4xl font-bold tracking-tight sm:text-6xl'>
+            Your Ultimate Crypto Companion
+          </h1>
+          <p className='mt-6 text-lg leading-8 text-muted-foreground'>
+            Stay ahead of the market with real-time data, personalized alerts, and comprehensive
+            analysis. Track your portfolio, monitor market trends, and make informed decisions.
+          </p>
+          <div className='mt-10 flex items-center gap-x-6'>
+            <Link
+              to='#market-trends'
+              className='rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'>
+              Get Started
+              <ArrowRight className='ml-2 -mr-1 h-4 w-4 inline-block' />
+            </Link>
+            <Link
+              to='#crypto-news'
+              className='text-sm font-semibold leading-6 text-foreground hover:text-primary'>
+              Learn more <span aria-hidden='true'>→</span>
+            </Link>
+          </div>
+        </div>
+        <div className='mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32'>
+          <div className='max-w-3xl flex-none sm:max-w-5xl lg:max-w-none'>
+            <img
+              src='https://images.unsplash.com/photo-1518546305927-5a555bb7020d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80'
+              alt='Crypto trading dashboard'
+              className='w-[76rem] rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10'
+            />
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Hero;
+}
