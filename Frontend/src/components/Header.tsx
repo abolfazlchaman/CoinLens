@@ -1,110 +1,107 @@
 import React from 'react';
-import { useCryptoData } from '../hooks/useCryptoData';
-import type { GlobalData } from '../services/api';
-import { cryptoService } from '../services/cryptoService';
-import { LoadingSpinner } from './LoadingSpinner';
-import { ErrorBoundary } from './ErrorBoundary';
+import { useTheme } from 'next-themes';
+import { useLanguage } from '../contexts/LanguageContext';
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { Moon, Sun, Globe } from 'lucide-react';
 
-interface HeaderProps {
-  isDarkMode: boolean;
-  onThemeToggle: () => void;
-  language: string;
-  onLanguageChange: (lang: string) => void;
-}
-
-const formatNumber = (num: number | undefined): string => {
-  if (typeof num !== 'number') return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  }).format(num);
-};
-
-const formatPercentage = (num: number | undefined): string => {
-  if (typeof num !== 'number') return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'percent',
-    signDisplay: 'always',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(num / 100);
-};
-
-export function Header({ isDarkMode, onThemeToggle, language, onLanguageChange }: HeaderProps) {
-  const {
-    data: marketData,
-    isLoading,
-    error,
-  } = useCryptoData<GlobalData>('global-data', () => cryptoService.getGlobalData());
+export default function Header() {
+  const { theme, setTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
 
   return (
-    <header className='bg-white dark:bg-gray-800 shadow-md'>
-      <div className='container mx-auto px-4 py-4'>
-        <div className='flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0'>
-          <div className='flex items-center space-x-4'>
-            <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>CryptoMan</h1>
-            <div className='flex items-center space-x-2'>
-              <select
-                value={language}
-                onChange={(e) => onLanguageChange(e.target.value)}
-                className='bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'>
-                <option value='en'>English</option>
-                <option value='es'>Español</option>
-                <option value='fr'>Français</option>
-                <option value='de'>Deutsch</option>
-                <option value='zh'>中文</option>
-                <option value='ja'>日本語</option>
-                <option value='ko'>한국어</option>
-                <option value='ru'>Русский</option>
-              </select>
-              <button
-                onClick={onThemeToggle}
-                className='p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500'>
-                {isDarkMode ? '🌞' : '🌙'}
-              </button>
-            </div>
-          </div>
-
-          <div className='flex items-center space-x-6'>
-            {isLoading ? (
-              <LoadingSpinner />
-            ) : error ? (
-              <div className='text-red-500 dark:text-red-400'>{error.message}</div>
-            ) : (
-              <>
-                <div className='text-sm'>
-                  <span className='text-gray-500 dark:text-gray-400'>Market Cap: </span>
-                  <span className='font-medium text-gray-900 dark:text-white'>
-                    {formatNumber(marketData?.total_market_cap?.usd)}
-                  </span>
-                </div>
-                <div className='text-sm'>
-                  <span className='text-gray-500 dark:text-gray-400'>24h Vol: </span>
-                  <span className='font-medium text-gray-900 dark:text-white'>
-                    {formatNumber(marketData?.total_volume?.usd)}
-                  </span>
-                </div>
-                <div className='text-sm'>
-                  <span className='text-gray-500 dark:text-gray-400'>BTC Dominance: </span>
-                  <span className='font-medium text-gray-900 dark:text-white'>
-                    {formatPercentage(marketData?.market_cap_percentage?.btc)}
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+    <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+      <div className='container flex h-14 items-center'>
+        <div className='mr-4 flex'>
+          <a
+            className='mr-6 flex items-center space-x-2'
+            href='/'>
+            <span className='font-display text-xl font-bold'>UltraDeal</span>
+          </a>
+          <nav className='flex items-center space-x-6 text-sm font-medium'>
+            <a
+              href='#news'
+              className='transition-colors hover:text-foreground/80'>
+              News
+            </a>
+            <a
+              href='#exchanges'
+              className='transition-colors hover:text-foreground/80'>
+              Exchanges
+            </a>
+            <a
+              href='#market-trends'
+              className='transition-colors hover:text-foreground/80'>
+              Market Trends
+            </a>
+            <a
+              href='#market-sentiment'
+              className='transition-colors hover:text-foreground/80'>
+              Market Sentiment
+            </a>
+            <a
+              href='#market-heatmap'
+              className='transition-colors hover:text-foreground/80'>
+              Market Heatmap
+            </a>
+            <a
+              href='#portfolio'
+              className='transition-colors hover:text-foreground/80'>
+              Portfolio
+            </a>
+            <a
+              href='#price-alerts'
+              className='transition-colors hover:text-foreground/80'>
+              Price Alerts
+            </a>
+          </nav>
+        </div>
+        <div className='flex flex-1 items-center justify-end space-x-2'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'>
+                <Sun className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
+                <Moon className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
+                <span className='sr-only'>Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'>
+                <Globe className='h-[1.2rem] w-[1.2rem]' />
+                <span className='sr-only'>Toggle language</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => setLanguage('en')}>English</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('es')}>Español</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('fr')}>Français</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('de')}>Deutsch</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('it')}>Italiano</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('pt')}>Português</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('ru')}>Русский</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('zh')}>中文</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('ja')}>日本語</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('ko')}>한국어</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
-  );
-}
-
-export default function HeaderWithErrorBoundary(props: HeaderProps) {
-  return (
-    <ErrorBoundary>
-      <Header {...props} />
-    </ErrorBoundary>
   );
 }

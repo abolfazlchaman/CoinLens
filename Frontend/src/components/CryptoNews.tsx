@@ -1,8 +1,14 @@
-import React from 'react';
-import { useCryptoData } from '../hooks/useCryptoData';
-import { cryptoService } from '../services/cryptoService';
-import { LoadingSpinner } from './LoadingSpinner';
-import { ErrorBoundary } from './ErrorBoundary';
+import React, { useState, useEffect } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { cryptoApi } from '../services/api';
+import { Card, CardContent } from './ui/card';
+import { Button } from './ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 interface NewsItem {
   id: string;
@@ -13,85 +19,103 @@ interface NewsItem {
   description: string;
 }
 
-export function CryptoNews() {
-  const {
-    data: news,
-    isLoading,
-    error,
-    refetch,
-  } = useCryptoData<NewsItem[]>('news', () => cryptoService.getNews());
+export default function CryptoNews() {
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const data = await cryptoApi.getNews();
+        setNews(data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching news:', error);
+        setError('Failed to fetch news');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+    const interval = setInterval(fetchNews, 5 * 60 * 1000); // Update every 5 minutes
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <LoadingSpinner />
+      <div className='w-full animate-pulse'>
+        <div className='h-64 bg-gray-200 dark:bg-gray-700 rounded-lg'></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <div className='text-red-500 dark:text-red-400'>{error.message}</div>
-        <button
-          onClick={() => refetch()}
-          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-          Retry
-        </button>
+      <div className='w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
+        <p className='text-red-500 dark:text-red-400'>{error}</p>
       </div>
     );
   }
 
-  if (!news?.length) {
-    return null;
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    }).format(date);
-  };
-
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>📰 Latest News</h2>
-      <div className='space-y-4'>
-        {news.map((item) => (
-          <a
-            key={item.id}
-            href={item.url}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='block p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'>
-            <div className='flex justify-between items-start mb-2'>
-              <span className='text-sm font-medium text-blue-600 dark:text-blue-400'>
-                {item.source}
-              </span>
-              <span className='text-xs text-gray-500 dark:text-gray-400'>
-                {formatDate(item.published_at)}
-              </span>
-            </div>
-            <h3 className='text-base font-medium text-gray-900 dark:text-white mb-2'>
-              {item.title}
-            </h3>
-            <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2'>
-              {item.description}
-            </p>
-          </a>
-        ))}
+    <div className='w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden'>
+      <div className='flex items-center justify-between p-4 border-b dark:border-gray-700'>
+        <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>Latest News</h2>
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className='hover:bg-gray-100 dark:hover:bg-gray-700'>
+          {isCollapsed ? <ChevronDown /> : <ChevronUp />}
+        </Button>
       </div>
+      {!isCollapsed && (
+        <div className='p-4'>
+          <Swiper
+            modules={[Autoplay, Navigation, Pagination]}
+            spaceBetween={20}
+            slidesPerView={1}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+            className='w-full'>
+            {news.map((item) => (
+              <SwiperSlide key={item.id}>
+                <Card className='h-full'>
+                  <CardContent className='p-4'>
+                    <div className='flex flex-col h-full'>
+                      <h3 className='text-lg font-semibold mb-2 line-clamp-2'>{item.title}</h3>
+                      <p className='text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3'>
+                        {item.description}
+                      </p>
+                      <div className='mt-auto'>
+                        <div className='flex items-center justify-between text-sm text-gray-500 dark:text-gray-400'>
+                          <span>{item.source}</span>
+                          <span>{new Date(item.published_at).toLocaleDateString()}</span>
+                        </div>
+                        <a
+                          href={item.url}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='mt-2 inline-block text-blue-600 dark:text-blue-400 hover:underline'>
+                          Read more
+                        </a>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      )}
     </div>
-  );
-}
-
-export default function CryptoNewsWithErrorBoundary() {
-  return (
-    <ErrorBoundary>
-      <CryptoNews />
-    </ErrorBoundary>
   );
 }

@@ -11,7 +11,7 @@ interface PortfolioItem {
   currentPrice: number;
 }
 
-const Portfolio: React.FC = () => {
+export default function Portfolio() {
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [selectedCoin, setSelectedCoin] = useState('');
   const [amount, setAmount] = useState('');
@@ -242,6 +242,4 @@ const Portfolio: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Portfolio;
+}

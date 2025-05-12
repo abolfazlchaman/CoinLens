@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cryptoApi, GlobalData } from '../services/api';
 
-const MarketTrends: React.FC = () => {
+export default function MarketTrends() {
   const [marketData, setMarketData] = useState<GlobalData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,6 +105,4 @@ const MarketTrends: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default MarketTrends;
+}

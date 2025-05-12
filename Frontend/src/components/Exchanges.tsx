@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useCryptoData } from '../hooks/useCryptoData';
-import { cryptoService } from '../services/cryptoService';
-import { LoadingSpinner } from './LoadingSpinner';
-import { ErrorBoundary } from './ErrorBoundary';
+import { cryptoApi } from '../services/api';
+import { Card, CardContent } from './ui/card';
+import { Button } from './ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Exchange {
   id: string;
@@ -12,70 +12,92 @@ interface Exchange {
   trade_volume_24h_btc: number;
 }
 
-export function Exchanges() {
-  const {
-    data: exchanges,
-    isLoading,
-    error,
-    refetch,
-  } = useCryptoData<Exchange[]>('exchanges', () => cryptoService.getExchanges());
+export default function Exchanges() {
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    const fetchExchanges = async () => {
+      try {
+        const data = await cryptoApi.getExchanges();
+        setExchanges(data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching exchanges:', error);
+        setError('Failed to fetch exchanges');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExchanges();
+    const interval = setInterval(fetchExchanges, 5 * 60 * 1000); // Update every 5 minutes
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <LoadingSpinner />
+      <div className='w-full animate-pulse'>
+        <div className='h-64 bg-gray-200 dark:bg-gray-700 rounded-lg'></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-        <div className='text-red-500 dark:text-red-400'>{error.message}</div>
-        <button
-          onClick={() => refetch()}
-          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-          Retry
-        </button>
+      <div className='w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
+        <p className='text-red-500 dark:text-red-400'>{error}</p>
       </div>
     );
   }
 
-  if (!exchanges?.length) {
-    return null;
-  }
-
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
-      <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>💱 Top Exchanges</h2>
-      <div className='space-y-4'>
-        {exchanges.map((exchange) => (
-          <div
-            key={exchange.id}
-            className='flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg'>
-            <div>
-              <h3 className='text-lg font-medium text-gray-900 dark:text-white'>{exchange.name}</h3>
-              <p className='text-sm text-gray-500 dark:text-gray-400'>{exchange.country}</p>
-            </div>
-            <div className='text-right'>
-              <p className='text-lg font-medium text-gray-900 dark:text-white'>
-                ${(exchange.trade_volume_24h_btc * 50000).toLocaleString()}
-              </p>
-              <p className='text-sm text-gray-500 dark:text-gray-400'>
-                Trust Score: {exchange.trust_score}
-              </p>
-            </div>
-          </div>
-        ))}
+    <div className='w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden'>
+      <div className='flex items-center justify-between p-4 border-b dark:border-gray-700'>
+        <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>Top Exchanges</h2>
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className='hover:bg-gray-100 dark:hover:bg-gray-700'>
+          {isCollapsed ? <ChevronDown /> : <ChevronUp />}
+        </Button>
       </div>
+      {!isCollapsed && (
+        <div className='p-4'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+            {exchanges.map((exchange) => (
+              <Card
+                key={exchange.id}
+                className='h-full'>
+                <CardContent className='p-4'>
+                  <div className='flex flex-col h-full'>
+                    <h3 className='text-lg font-semibold mb-2 line-clamp-1'>{exchange.name}</h3>
+                    <div className='space-y-2 text-sm text-gray-600 dark:text-gray-400'>
+                      <p className='flex justify-between'>
+                        <span>Country:</span>
+                        <span className='font-medium'>{exchange.country}</span>
+                      </p>
+                      <p className='flex justify-between'>
+                        <span>Trust Score:</span>
+                        <span className='font-medium'>{exchange.trust_score}</span>
+                      </p>
+                      <p className='flex justify-between'>
+                        <span>24h Volume (BTC):</span>
+                        <span className='font-medium'>
+                          {exchange.trade_volume_24h_btc.toLocaleString()}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
-  );
-}
-
-export default function ExchangesWithErrorBoundary() {
-  return (
-    <ErrorBoundary>
-      <Exchanges />
-    </ErrorBoundary>
   );
 }

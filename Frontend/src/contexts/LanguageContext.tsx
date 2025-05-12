@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Language = 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja' | 'ko' | 'ru';
+type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ru' | 'zh' | 'ja' | 'ko';
 
 interface LanguageContextType {
   language: Language;
-  onLanguageChange: (lang: Language) => void;
+  setLanguage: (language: Language) => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = localStorage.getItem('language');
     return (savedLanguage as Language) || 'en';
@@ -20,21 +20,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = language;
   }, [language]);
 
-  const onLanguageChange = (lang: Language) => {
-    setLanguage(lang);
-  };
-
   return (
-    <LanguageContext.Provider value={{ language, onLanguageChange }}>
+    <LanguageContext.Provider value={{ language, setLanguage }}>
       {children}
     </LanguageContext.Provider>
   );
-}
+};
 
-export function useLanguage() {
+export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-}
+};

@@ -8,7 +8,7 @@ interface SentimentData {
   time_until_update: string;
 }
 
-const MarketSentiment: React.FC = () => {
+export default function MarketSentiment() {
   const [sentiment, setSentiment] = useState<SentimentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +129,4 @@ const MarketSentiment: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default MarketSentiment;
+}

@@ -1,147 +1,108 @@
-import React, { useState } from 'react';
-import { useCryptoData } from '../hooks/useCryptoData';
-import { cryptoService } from '../services/cryptoService';
-import type { MarketData } from '../services/api';
-import { LoadingSpinner } from './LoadingSpinner';
-import { ErrorBoundary } from './ErrorBoundary';
+import React, { useState, useEffect } from 'react';
+import { cryptoApi } from '../services/api';
+import { Card, CardContent } from './ui/card';
+import { Button } from './ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
-const formatNumber = (num: number | undefined): string => {
-  if (typeof num !== 'number') return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    notation: 'compact',
-    maximumFractionDigits: 2,
-  }).format(num);
-};
+interface MarketData {
+  id: string;
+  symbol: string;
+  name: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  market_cap: number;
+}
 
-const formatPercentage = (num: number | undefined): string => {
-  if (typeof num !== 'number') return 'N/A';
-  return new Intl.NumberFormat('en-US', {
-    style: 'percent',
-    signDisplay: 'always',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(num / 100);
-};
+export default function MarketHeatmap() {
+  const [marketData, setMarketData] = useState<MarketData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { theme } = useTheme();
 
-export function MarketHeatmap() {
-  const [timeframe, setTimeframe] = useState<'1h' | '24h' | '7d'>('24h');
-  const { data, isLoading, error, refetch } = useCryptoData<MarketData[]>('market-data', () =>
-    cryptoService.getMarketData(),
-  );
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      try {
+        const data = await cryptoApi.getMarketData();
+        setMarketData(data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+        setError('Failed to fetch market data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const getPriceChange = (coin: MarketData) => {
-    if (!coin) return 0;
-    switch (timeframe) {
-      case '1h':
-        return coin.price_change_percentage_1h_in_currency || 0;
-      case '24h':
-        return coin.price_change_percentage_24h || 0;
-      case '7d':
-        return coin.price_change_percentage_7d_in_currency || 0;
-      default:
-        return 0;
-    }
+    fetchMarketData();
+    const interval = setInterval(fetchMarketData, 5 * 60 * 1000); // Update every 5 minutes
+    return () => clearInterval(interval);
+  }, []);
+
+  const getColorClass = (percentage: number) => {
+    if (percentage >= 5) return 'bg-green-500/20 text-green-700 dark:text-green-400';
+    if (percentage >= 0) return 'bg-green-500/10 text-green-600 dark:text-green-500';
+    if (percentage >= -5) return 'bg-red-500/10 text-red-600 dark:text-red-500';
+    return 'bg-red-500/20 text-red-700 dark:text-red-400';
   };
 
-  const getColor = (change: number) => {
-    if (change > 5) return 'bg-green-500 dark:bg-green-600';
-    if (change > 0) return 'bg-green-300 dark:bg-green-400';
-    if (change > -5) return 'bg-red-300 dark:bg-red-400';
-    return 'bg-red-500 dark:bg-red-600';
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6'>
-        <LoadingSpinner />
+      <div className='w-full animate-pulse'>
+        <div className='h-64 bg-gray-200 dark:bg-gray-700 rounded-lg'></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6'>
-        <div className='text-red-500 dark:text-red-400'>{error.message}</div>
-        <button
-          onClick={() => refetch()}
-          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-          Retry
-        </button>
+      <div className='w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4'>
+        <p className='text-red-500 dark:text-red-400'>{error}</p>
       </div>
     );
   }
 
-  if (!data?.length) {
-    return null;
-  }
-
   return (
-    <div className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6'>
-      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6'>
-        <h2 className='text-xl font-bold text-gray-900 dark:text-white'>Market Heatmap</h2>
-        <div className='flex space-x-2'>
-          {(['1h', '24h', '7d'] as const).map((tf) => (
-            <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                timeframe === tf
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}>
-              {tf}
-            </button>
-          ))}
+    <div className='w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden'>
+      <div className='flex items-center justify-between p-4 border-b dark:border-gray-700'>
+        <h2 className='text-xl font-semibold text-gray-900 dark:text-white'>Market Heatmap</h2>
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className='hover:bg-gray-100 dark:hover:bg-gray-700'>
+          {isCollapsed ? <ChevronDown /> : <ChevronUp />}
+        </Button>
+      </div>
+      {!isCollapsed && (
+        <div className='p-4'>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2'>
+            {marketData.map((coin) => (
+              <Card
+                key={coin.id}
+                className='overflow-hidden'>
+                <CardContent className='p-2'>
+                  <div className='flex flex-col items-center text-center'>
+                    <div className='text-sm font-medium text-gray-900 dark:text-white mb-1'>
+                      {coin.symbol.toUpperCase()}
+                    </div>
+                    <div
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${getColorClass(
+                        coin.price_change_percentage_24h,
+                      )}`}>
+                      {coin.price_change_percentage_24h.toFixed(2)}%
+                    </div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                      ${coin.current_price.toLocaleString()}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-        {data.slice(0, 8).map((coin) => {
-          const change = getPriceChange(coin);
-          return (
-            <div
-              key={coin.id}
-              className={`p-4 rounded-lg ${getColor(change)} transition-colors duration-200`}>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center space-x-2'>
-                  <img
-                    src={coin.image}
-                    alt={coin.name}
-                    className='w-6 h-6 rounded-full'
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder-coin.png';
-                    }}
-                  />
-                  <span className='font-medium text-gray-900 dark:text-white'>
-                    {coin.symbol.toUpperCase()}
-                  </span>
-                </div>
-                <span
-                  className={`font-medium ${
-                    change >= 0
-                      ? 'text-green-900 dark:text-green-100'
-                      : 'text-red-900 dark:text-red-100'
-                  }`}>
-                  {formatPercentage(change)}
-                </span>
-              </div>
-              <div className='mt-2 text-sm text-gray-600 dark:text-gray-300'>
-                {formatNumber(coin.current_price)}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      )}
     </div>
-  );
-}
-
-export default function MarketHeatmapWithErrorBoundary() {
-  return (
-    <ErrorBoundary>
-      <MarketHeatmap />
-    </ErrorBoundary>
   );
 }
