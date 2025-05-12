@@ -21,11 +21,11 @@ export default function App() {
           <Header />
           <main className='flex flex-col gap-16'>
             <Hero />
+            <MarketHeatmap />
             <MarketTrends />
-            <Portfolio />
+            {/* <Portfolio /> */}
             <PriceAlerts />
             <MarketSentiment />
-            <MarketHeatmap />
             <CryptoNews />
             <Exchanges />
           </main>
