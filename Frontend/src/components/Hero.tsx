@@ -16,14 +16,14 @@ export default function Hero() {
 
       {/* Content */}
       <div className='container relative mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-32 text-center'>
-        <h1 className='mb-6 text-4xl font-bold tracking-tight sm:text-6xl'>
+        <h1 className='mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl'>
           Your Ultimate{' '}
           <span className='bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent'>
             Crypto Companion
           </span>
         </h1>
 
-        <p className='mb-8 max-w-2xl text-lg text-muted-foreground sm:text-xl'>
+        <p className='mb-8 max-w-2xl text-lg text-white sm:text-xl'>
           Access{' '}
           <span className='font-semibold text-primary'>free and real-time accurate data</span> for
           all your cryptocurrency needs. Track market trends, manage your portfolio, and stay
@@ -48,16 +48,30 @@ export default function Hero() {
 
         <div className='flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0'>
           <Link
-            to='/market-trends'
+            to='/'
+            onClick={() => {
+              const element = document.querySelector('#market-heatmap');
+              if (element) {
+                const headerOffset = 80;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth',
+                });
+              }
+            }}
             className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
-            Get Started
+            Latest changes
             <ArrowRight className='ml-2 h-4 w-4' />
           </Link>
-          <Link
-            to='/learn'
-            className='inline-flex items-center justify-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground'>
-            Learn More
-          </Link>
+          <a
+            href='https://www.coingecko.com/learn'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='inline-flex items-center justify-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium text-dark transition-colors hover:bg-muted hover:text-muted-foreground'>
+            Learn Trading from the best!
+          </a>
         </div>
       </div>
     </div>
