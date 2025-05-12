@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
 import { TrendingUp, TrendingDown, Minus, Bell } from 'lucide-react';
 import { Button } from './ui/button';
+import PriceAlerts from './PriceAlerts';
 
 interface MarketSentiment {
   value: string;
@@ -74,7 +75,8 @@ export default function MarketSentiment() {
             </Button>
           </div>
 
-          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
+            {/* Fear & Greed Index Card */}
             <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
               <div className='flex items-center justify-between'>
                 <div>
@@ -109,6 +111,17 @@ export default function MarketSentiment() {
                   can indicate buying opportunities, while extreme greed suggests a potential market
                   correction.
                 </p>
+              </div>
+            </div>
+
+            {/* Price Alerts Card */}
+            <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>
+              <div className='flex items-center justify-between mb-4'>
+                <h3 className='font-medium'>Price Alerts</h3>
+                <Bell className='h-4 w-4 text-muted-foreground' />
+              </div>
+              <div className='flex flex-col items-center justify-center space-y-4'>
+                <PriceAlerts />
               </div>
             </div>
           </div>
