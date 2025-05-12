@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: crypto-man-backend
+    env: node
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: REDIS_URL
+        fromDatabase:
+          name: crypto-man-redis
+          property: connectionString
+      - key: COINGECKO_API_KEY
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 60000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 50
+      - key: CACHE_TTL_MARKET_DATA
+        value: 300
+      - key: CACHE_TTL_COIN_LIST
+        value: 3600
+      - key: CACHE_TTL_GLOBAL_DATA
+        value: 300
+      - key: CACHE_TTL_TRENDING
+        value: 300
+      - key: CACHE_TTL_EXCHANGES
+        value: 3600
+
+databases:
+  - name: crypto-man-redis
+    databaseName: crypto-man-redis
+    plan: free 

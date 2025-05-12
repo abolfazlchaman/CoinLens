@@ -1,85 +1,92 @@
-# UltraDeal
+# Crypto Man
 
-A modern cryptocurrency tracking application built with React, TypeScript, and Tailwind CSS.
+A modern cryptocurrency tracking application with real-time data from CoinGecko API.
 
 ## Features
 
-- Real-time cryptocurrency price tracking using CoinGecko API
-- Dark/Light mode with system theme detection
-- Responsive design with mobile-first approach
-- Search functionality for cryptocurrencies
-- Language switching (placeholder for future i18n implementation)
-- Stock market heatmap (coming soon)
+- Real-time cryptocurrency price tracking
+- Historical price data visualization
+- Market cap and volume information
+- Responsive design with dark/light mode
+- Redis caching for optimal performance
+- Rate limiting protection
 
-## Tech Stack
+## Prerequisites
 
-- React 18
-- TypeScript
-- Tailwind CSS
-- Axios for API requests
-- Heroicons for icons
+- Docker and Docker Compose
+- Node.js 18+ (for development)
+- pnpm (for development)
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 16+
-- pnpm
-
-### Installation
+## Quick Start
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/crypto-man.git
+   git clone <repository-url>
    cd crypto-man
    ```
 
-2. Install dependencies:
+2. Run the application:
    ```bash
-   pnpm install
+   ./start.sh
    ```
 
-3. Start the development server:
-   ```bash
-   pnpm start
-   ```
+   This will:
+   - Check for Docker and Docker Compose
+   - Set up environment variables
+   - Start the backend and Redis containers
+   - Start the frontend development server
 
-The application will be available at `http://localhost:3000`.
+3. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
+   - API Documentation: http://localhost:3001/api-docs
 
-## Project Structure
+## Development
 
+### Frontend Development
+
+```bash
+cd Frontend
+pnpm install
+pnpm dev
 ```
-src/
-  ├── components/     # React components
-  ├── hooks/         # Custom React hooks
-  ├── types/         # TypeScript type definitions
-  ├── utils/         # Utility functions
-  └── styles/        # Global styles and Tailwind config
+
+### Backend Development
+
+```bash
+cd Backend
+pnpm install
+pnpm dev
 ```
 
-## Features to be Implemented
+## Environment Variables
 
-- [ ] i18n support for multiple languages
-- [ ] Stock market heatmap visualization
-- [ ] Detailed cryptocurrency information pages
-- [ ] Price alerts and notifications
-- [ ] Portfolio tracking
-- [ ] Historical price charts
+The application uses the following environment variables:
 
-## Contributing
+### Frontend (.env.local)
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### Backend (.env)
+```
+PORT=3001
+NODE_ENV=development
+COINGECKO_API_KEY=your_api_key_here
+REDIS_URL=redis://redis:6379
+```
+
+## API Documentation
+
+Once the backend is running, visit http://localhost:3001/api-docs for detailed API documentation.
+
+## Architecture
+
+- Frontend: Next.js 15 with App Router
+- Backend: Node.js/Express with TypeScript
+- Database: Redis for caching
+- API: CoinGecko API for cryptocurrency data
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [CoinGecko API](https://www.coingecko.com/en/api) for cryptocurrency data
-- [Tailwind CSS](https://tailwindcss.com/) for styling
-- [Heroicons](https://heroicons.com/) for icons
+MIT 
