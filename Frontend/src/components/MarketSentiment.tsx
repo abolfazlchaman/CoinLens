@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Bell } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface MarketSentiment {
   value: string;
@@ -65,7 +66,13 @@ export default function MarketSentiment() {
     <div className='w-full bg-muted/50 py-16'>
       <div className='container mx-auto px-4'>
         <div className='space-y-8'>
-          <h2 className='text-3xl font-bold'>Market Sentiment</h2>
+          <div className='flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0'>
+            <h2 className='text-3xl font-bold'>Market Sentiment</h2>
+            <Button className='w-full lg:w-auto'>
+              <Bell className='mr-2 h-4 w-4' />
+              Create Price Alert
+            </Button>
+          </div>
 
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
             <div className='group relative overflow-hidden rounded-lg bg-card p-6 transition-all hover:shadow-lg'>

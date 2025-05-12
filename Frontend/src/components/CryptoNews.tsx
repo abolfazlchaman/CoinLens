@@ -23,7 +23,7 @@ const unsplashImages = [
   'https://images.unsplash.com/photo-1621761191319-c6fb62004040',
 ];
 
-export function CryptoNews() {
+function CryptoNews() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,13 +31,11 @@ export function CryptoNews() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        setLoading(true);
         const data = await cryptoApi.getNews();
         setNews(data);
-        setError(null);
       } catch (err) {
-        console.error('Error fetching news:', err);
-        setError('Failed to fetch news. Please try again later.');
+        setError('Failed to fetch news');
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -48,70 +46,45 @@ export function CryptoNews() {
 
   if (loading) {
     return (
-      <div className='rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg'>
-        <LoadingSpinner />
+      <div className='flex h-48 items-center justify-center'>
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className='rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg'>
-        <div className='text-red-500 dark:text-red-400'>{error}</div>
-        <button
-          onClick={() => window.location.reload()}
-          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'>
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  if (!news.length) {
-    return (
-      <div className='rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg'>
-        <div className='text-gray-500 dark:text-gray-400'>No news available</div>
-      </div>
-    );
+    return <div className='flex h-48 items-center justify-center text-destructive'>{error}</div>;
   }
 
   return (
-    <div className='space-y-4'>
-      {news.map((item) => (
-        <a
-          key={item.id}
-          href={item.url}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='block rounded-lg bg-white dark:bg-gray-800 p-4 shadow-md hover:shadow-lg transition-shadow'>
-          <div className='flex items-start space-x-4'>
-            {item.image_url && (
-              <img
-                src={item.image_url}
-                alt={item.title}
-                className='w-24 h-24 object-cover rounded-lg'
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder-news.png';
-                }}
-              />
-            )}
-            <div className='flex-1'>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
-                {item.title}
-              </h3>
-              <div className='flex items-center justify-between text-sm text-gray-500 dark:text-gray-400'>
-                <span>{item.source}</span>
-                <span>{new Date(item.published_at).toLocaleDateString()}</span>
-              </div>
-              <div className='mt-2 flex items-center text-blue-500 dark:text-blue-400'>
-                <span className='text-sm'>Read more</span>
-                <ExternalLink className='ml-1 h-4 w-4' />
-              </div>
-            </div>
+    <div className='w-full bg-muted/50 py-8'>
+      <div className='container mx-auto px-4'>
+        <div className='space-y-4'>
+          <h2 className='text-2xl font-bold'>Latest Crypto News</h2>
+
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+            {news.slice(0, 6).map((item) => (
+              <a
+                key={item.id}
+                href={item.url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='group relative overflow-hidden rounded-lg bg-card p-4 transition-all hover:shadow-lg'>
+                <div className='space-y-2'>
+                  <div className='flex items-start justify-between'>
+                    <h3 className='line-clamp-2 text-sm font-medium'>{item.title}</h3>
+                    <ExternalLink className='ml-2 h-4 w-4 flex-shrink-0 text-muted-foreground' />
+                  </div>
+                  <div className='flex items-center justify-between text-xs text-muted-foreground'>
+                    <span>{item.source}</span>
+                    <span>{new Date(item.published_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
-        </a>
-      ))}
+        </div>
+      </div>
     </div>
   );
 }

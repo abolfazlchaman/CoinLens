@@ -5,13 +5,13 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Menu, X, Sun, Moon, Globe } from 'lucide-react';
 
 const navigation = [
-  { name: 'Market Trends', href: '#market-trends' },
+  { name: 'Market Heatmap', href: '#market-heatmap' },
+  { name: 'Top Exchanges', href: '#exchanges' },
+  { name: 'Crypto News', href: '#crypto-news' },
+  { name: 'Trading Coins', href: '#market-trends' },
+  { name: 'Market Sentiment', href: '#market-sentiment' },
   { name: 'Portfolio', href: '#portfolio' },
   { name: 'Price Alerts', href: '#price-alerts' },
-  { name: 'Market Sentiment', href: '#market-sentiment' },
-  { name: 'Market Heatmap', href: '#market-heatmap' },
-  { name: 'Crypto News', href: '#crypto-news' },
-  { name: 'Exchanges', href: '#exchanges' },
 ];
 
 export default function Header() {
