@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
             <Link
               to='/'
               className='flex items-center space-x-2 text-2xl font-bold text-primary'>
-              <span>UltraDeal</span>
+              <span>CoinLens</span>
             </Link>
             <p className='text-sm text-muted-foreground'>
               Your all-in-one platform for cryptocurrency market analysis, portfolio tracking, and
@@ -150,7 +150,7 @@ const Footer: React.FC = () => {
 
         {/* Bottom Section */}
         <div className='mt-12 border-t pt-8 text-center text-sm text-muted-foreground'>
-          <p>© {currentYear} UltraDeal. All rights reserved.</p>
+          <p>© {currentYear} CoinLens. All rights reserved.</p>
           <p className='mt-2'>
             Powered by{' '}
             <a

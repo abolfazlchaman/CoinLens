@@ -45,7 +45,7 @@ export default function Header() {
             <Link
               to='/'
               className='text-2xl font-bold'>
-              UltraDeal
+              CoinLens
             </Link>
           </div>
 
