@@ -5,8 +5,8 @@ import Hero from './components/Hero';
 import CryptoNews from './components/CryptoNews';
 import Exchanges from './components/Exchanges';
 import MarketTrends from './components/MarketTrends';
-import Portfolio from './components/Portfolio';
-import PriceAlerts from './components/PriceAlerts';
+// import Portfolio from './components/Portfolio';
+// import PriceAlerts from './components/PriceAlerts';
 import MarketSentiment from './components/MarketSentiment';
 import MarketHeatmap from './components/MarketHeatmap';
 import Footer from './components/Footer';
@@ -24,7 +24,7 @@ export default function App() {
             <MarketHeatmap />
             <MarketTrends />
             {/* <Portfolio /> */}
-            <PriceAlerts />
+            {/* <PriceAlerts /> */}
             <MarketSentiment />
             <CryptoNews />
             <Exchanges />
