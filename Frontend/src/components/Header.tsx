@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useTheme } from './theme-provider';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -25,6 +25,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +37,12 @@ export default function Header() {
   }, []);
 
   const scrollToSection = (href: string) => {
+    // If we're not on the home page, navigate to home page first
+    if (location.pathname !== '/') {
+      window.location.href = `/${href}`;
+      return;
+    }
+
     const element = document.querySelector(href);
     if (element) {
       const headerOffset = 80;
@@ -48,6 +55,14 @@ export default function Header() {
       });
     }
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLinkClick = () => {
+    setIsMobileMenuOpen(false);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
 
   return (
@@ -72,14 +87,15 @@ export default function Header() {
                 {item.name}
               </button>
             ))}
-            {/* {footerLinks.map((item) => (
+            {footerLinks.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={handleLinkClick}
                 className='text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'>
                 {item.name}
               </Link>
-            ))} */}
+            ))}
           </div>
 
           <div className='flex items-center space-x-4'>
@@ -122,6 +138,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   to={item.href}
+                  onClick={handleLinkClick}
                   className='block w-full px-3 py-2 text-left text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
                   {item.name}
                 </Link>
