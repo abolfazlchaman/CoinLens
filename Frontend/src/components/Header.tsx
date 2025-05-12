@@ -6,12 +6,12 @@ import { Menu, X, Sun, Moon, Globe } from 'lucide-react';
 
 const navigation = [
   { name: 'Market Heatmap', href: '#market-heatmap' },
+  { name: 'Trading Coins', href: '#market-trends' },
+  { name: 'Portfolio', href: '#market-sentiment' },
+  { name: 'Price Alerts', href: '#market-sentiment' },
   { name: 'Top Exchanges', href: '#exchanges' },
   { name: 'Crypto News', href: '#crypto-news' },
-  { name: 'Trading Coins', href: '#market-trends' },
   { name: 'Market Sentiment', href: '#market-sentiment' },
-  { name: 'Portfolio', href: '#portfolio' },
-  { name: 'Price Alerts', href: '#price-alerts' },
 ];
 
 export default function Header() {
@@ -32,7 +32,14 @@ export default function Header() {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerOffset = 80; // Height of the fixed header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
       setIsMobileMenuOpen(false);
     }
   };

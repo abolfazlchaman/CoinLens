@@ -21,13 +21,23 @@ export default function App() {
           <Header />
           <main className='flex flex-col gap-16'>
             <Hero />
-            <MarketHeatmap />
-            <MarketTrends />
+            <section id='market-heatmap'>
+              <MarketHeatmap />
+            </section>
+            <section id='market-trends'>
+              <MarketTrends />
+            </section>
             {/* <Portfolio /> */}
             {/* <PriceAlerts /> */}
-            <MarketSentiment />
-            <CryptoNews />
-            <Exchanges />
+            <section id='market-sentiment'>
+              <MarketSentiment />
+            </section>
+            <section id='exchanges'>
+              <Exchanges />
+            </section>
+            <section id='crypto-news'>
+              <CryptoNews />
+            </section>
           </main>
           <Footer />
         </div>
