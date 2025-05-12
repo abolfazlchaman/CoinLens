@@ -1,6 +1,48 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
+import { Github, Twitter, Linkedin, ExternalLink, Mail, LucideIcon } from 'lucide-react';
+
+interface BaseLink {
+  name: string;
+  href: string;
+}
+
+interface IconLink extends BaseLink {
+  icon: LucideIcon;
+}
+
+type FooterLink = BaseLink | IconLink;
+
+interface LinkGroup {
+  title: string;
+  links: FooterLink[];
+}
+
+const footerLinks: LinkGroup[] = [
+  {
+    title: 'Company',
+    links: [
+      { name: 'About', href: '/about' },
+      { name: 'FAQ', href: '/faq' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { name: 'Privacy Policy', href: '/privacy' },
+      { name: 'Terms of Service', href: '/terms' },
+      { name: 'Disclaimer', href: '/disclaimer' },
+    ],
+  },
+  {
+    title: 'Connect',
+    links: [
+      { name: 'GitHub', href: 'https://github.com/abolfazlchaman', icon: Github },
+      { name: 'LinkedIn', href: 'https://linkedin.com/in/abolfazlchaman', icon: Linkedin },
+      { name: 'Email', href: 'mailto:contact@abolfazlchaman.com', icon: Mail },
+    ],
+  },
+];
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -17,135 +59,33 @@ const Footer: React.FC = () => {
               <span>CoinLens</span>
             </Link>
             <p className='text-sm text-muted-foreground'>
-              Your all-in-one platform for cryptocurrency market analysis, portfolio tracking, and
-              real-time alerts.
+              Your trusted companion in the world of cryptocurrency. Providing real-time market data
+              and insights to help you make informed decisions.
             </p>
-            <div className='flex gap-4'>
-              <a
-                href='https://github.com/yourusername/crypto-man'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-muted-foreground hover:text-primary transition-colors'>
-                <Github className='w-5 h-5' />
-              </a>
-              <a
-                href='https://twitter.com/yourusername'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-muted-foreground hover:text-primary transition-colors'>
-                <Twitter className='w-5 h-5' />
-              </a>
-              <a
-                href='https://linkedin.com/in/yourusername'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-muted-foreground hover:text-primary transition-colors'>
-                <Linkedin className='w-5 h-5' />
-              </a>
+          </div>
+
+          {/* Links */}
+          {footerLinks.map((group) => (
+            <div
+              key={group.title}
+              className='space-y-4'>
+              <h3 className='text-sm font-semibold'>{group.title}</h3>
+              <ul className='space-y-2'>
+                {group.links.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      target={link.href.startsWith('http') ? '_blank' : undefined}
+                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      className='flex items-center space-x-2 text-sm text-muted-foreground transition-colors hover:text-foreground'>
+                      {'icon' in link && <link.icon className='h-4 w-4' />}
+                      <span>{link.name}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-
-          {/* Market Data Links */}
-          <div className='space-y-4'>
-            <h3 className='text-sm font-semibold'>Market Data</h3>
-            <ul className='space-y-2'>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/trending'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
-                  <span>Trending Coins</span>
-                  <ExternalLink className='h-4 w-4' />
-                </a>
-              </li>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/global'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
-                  <span>Global Stats</span>
-                  <ExternalLink className='h-4 w-4' />
-                </a>
-              </li>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/exchanges'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
-                  <span>Exchanges</span>
-                  <ExternalLink className='h-4 w-4' />
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div className='space-y-4'>
-            <h3 className='text-sm font-semibold'>Resources</h3>
-            <ul className='space-y-2'>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/learn'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
-                  <span>Learn Crypto</span>
-                  <ExternalLink className='h-4 w-4' />
-                </a>
-              </li>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/news'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
-                  <span>Crypto News</span>
-                  <ExternalLink className='h-4 w-4' />
-                </a>
-              </li>
-              <li>
-                <a
-                  href='https://www.coingecko.com/en/glossary'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground'>
-                  <span>Glossary</span>
-                  <ExternalLink className='h-4 w-4' />
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div className='space-y-4'>
-            <h3 className='text-sm font-semibold'>Legal</h3>
-            <ul className='space-y-2'>
-              <li>
-                <Link
-                  to='/privacy'
-                  className='text-sm text-muted-foreground hover:text-foreground'>
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to='/terms'
-                  className='text-sm text-muted-foreground hover:text-foreground'>
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to='/disclaimer'
-                  className='text-sm text-muted-foreground hover:text-foreground'>
-                  Disclaimer
-                </Link>
-              </li>
-            </ul>
-          </div>
+          ))}
         </div>
 
         {/* Bottom Section */}

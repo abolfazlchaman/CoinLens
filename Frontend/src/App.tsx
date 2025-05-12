@@ -1,5 +1,6 @@
 import { ThemeProvider } from './components/theme-provider';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CryptoNews from './components/CryptoNews';
@@ -10,6 +11,38 @@ import MarketTrends from './components/MarketTrends';
 import MarketSentiment from './components/MarketSentiment';
 import MarketHeatmap from './components/MarketHeatmap';
 import Footer from './components/Footer';
+import About from './pages/About';
+import FAQ from './pages/FAQ';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Disclaimer from './pages/Disclaimer';
+
+function Home() {
+  return (
+    <>
+      <Hero />
+      <main className='flex flex-col gap-16'>
+        <section id='market-heatmap'>
+          <MarketHeatmap />
+        </section>
+        <section id='market-trends'>
+          <MarketTrends />
+        </section>
+        {/* <Portfolio /> */}
+        {/* <PriceAlerts /> */}
+        <section id='market-sentiment'>
+          <MarketSentiment />
+        </section>
+        <section id='exchanges'>
+          <Exchanges />
+        </section>
+        <section id='crypto-news'>
+          <CryptoNews />
+        </section>
+      </main>
+    </>
+  );
+}
 
 export default function App() {
   return (
@@ -19,26 +52,32 @@ export default function App() {
       <LanguageProvider>
         <div className='min-h-screen bg-background font-sans antialiased'>
           <Header />
-          <main className='flex flex-col gap-16'>
-            <Hero />
-            <section id='market-heatmap'>
-              <MarketHeatmap />
-            </section>
-            <section id='market-trends'>
-              <MarketTrends />
-            </section>
-            {/* <Portfolio /> */}
-            {/* <PriceAlerts /> */}
-            <section id='market-sentiment'>
-              <MarketSentiment />
-            </section>
-            <section id='exchanges'>
-              <Exchanges />
-            </section>
-            <section id='crypto-news'>
-              <CryptoNews />
-            </section>
-          </main>
+          <Routes>
+            <Route
+              path='/'
+              element={<Home />}
+            />
+            <Route
+              path='/about'
+              element={<About />}
+            />
+            <Route
+              path='/faq'
+              element={<FAQ />}
+            />
+            <Route
+              path='/privacy'
+              element={<Privacy />}
+            />
+            <Route
+              path='/terms'
+              element={<Terms />}
+            />
+            <Route
+              path='/disclaimer'
+              element={<Disclaimer />}
+            />
+          </Routes>
           <Footer />
         </div>
       </LanguageProvider>

@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useTheme } from './theme-provider';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Menu, X, Sun, Moon, Globe } from 'lucide-react';
 
 const navigation = [
   { name: 'Market Heatmap', href: '#market-heatmap' },
-  { name: 'Trading Coins', href: '#market-trends' },
-  { name: 'Portfolio', href: '#market-sentiment' },
-  { name: 'Price Alerts', href: '#market-sentiment' },
-  { name: 'Top Exchanges', href: '#exchanges' },
-  { name: 'Crypto News', href: '#crypto-news' },
+  { name: 'Market Trends', href: '#market-trends' },
   { name: 'Market Sentiment', href: '#market-sentiment' },
+  { name: 'Exchanges', href: '#exchanges' },
+  { name: 'News', href: '#crypto-news' },
+];
+
+const footerLinks = [
+  { name: 'About', href: '/about' },
+  { name: 'FAQ', href: '/faq' },
+  { name: 'Privacy', href: '/privacy' },
+  { name: 'Terms', href: '/terms' },
+  { name: 'Disclaimer', href: '/disclaimer' },
 ];
 
 export default function Header() {
@@ -32,7 +38,7 @@ export default function Header() {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      const headerOffset = 80; // Height of the fixed header
+      const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -40,8 +46,8 @@ export default function Header() {
         top: offsetPosition,
         behavior: 'smooth',
       });
-      setIsMobileMenuOpen(false);
     }
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -66,6 +72,14 @@ export default function Header() {
                 {item.name}
               </button>
             ))}
+            {/* {footerLinks.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className='text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'>
+                {item.name}
+              </Link>
+            ))} */}
           </div>
 
           <div className='flex items-center space-x-4'>
@@ -92,17 +106,25 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className='fixed inset-0 top-16 z-50 bg-background md:hidden'>
-            <div className='flex h-full flex-col space-y-4 p-4'>
+          <div className='md:hidden w-full min-h-screen'>
+            <div className='space-y-1 px-2 pb-3 pt-2'>
               {navigation.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
-                  className='w-full rounded-lg px-4 py-3 text-lg font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
+                  className='block w-full px-3 py-2 text-left text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
                   {item.name}
                 </button>
+              ))}
+              {footerLinks.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className='block w-full px-3 py-2 text-left text-base font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'>
+                  {item.name}
+                </Link>
               ))}
             </div>
           </div>
