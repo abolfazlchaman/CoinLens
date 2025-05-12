@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-800 dark:bg-dark-900 dark:text-gray-200 transition-all min-h-screen flex flex-col;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-dark text-white;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary hover:bg-secondary-dark text-white;
+  }
+  
+  .skeleton {
+    @apply bg-gray-200 dark:bg-gray-700;
+    background-image: linear-gradient(90deg, #e2e8f0, #f1f5f9, #e2e8f0);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  .dark .skeleton {
+    background-image: linear-gradient(90deg, #334155, #475569, #334155);
+  }
+  
+  .heatmap-placeholder {
+    @apply rounded-lg h-64 flex items-center justify-center text-white font-bold text-xl;
+    background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899, #8b5cf6, #6366f1);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+  
+  .language-selector:hover .language-dropdown {
+    @apply block;
+  }
+  
+  .mobile-menu {
+    @apply max-h-0 overflow-hidden transition-all duration-300 ease-out;
+  }
+  
+  .mobile-menu.open {
+    @apply max-h-[500px];
+  }
+  
+  .search-container {
+    @apply relative max-w-2xl mx-auto mb-8;
+  }
+  
+  .search-input {
+    @apply w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-800 transition-all;
+  }
+  
+  .search-button {
+    @apply absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 
+           hover:text-indigo-600 dark:hover:text-indigo-400;
+  }
+  
+  .clear-button {
+    @apply absolute right-12 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 
+           hover:text-indigo-600 dark:hover:text-indigo-400;
+  }
+} 

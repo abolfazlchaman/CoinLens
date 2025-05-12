@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultradeal - Crypto & Stock Market Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#4f46e5',
+                            dark: '#6366f1'
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 2s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .skeleton {
+            background-color: #e2e8f0;
+            background-image: linear-gradient(90deg, #e2e8f0, #f1f5f9, #e2e8f0);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        .dark .skeleton {
+            background-color: #334155;
+            background-image: linear-gradient(90deg, #334155, #475569, #334155);
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        
+        .heatmap-placeholder {
+            background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899, #8b5cf6, #6366f1);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        
+        .language-selector:hover .language-dropdown {
+            display: block;
+        }
+        
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-dark-900 dark:text-gray-200 transition-all min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white dark:bg-dark-800 shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                        <span class="text-white font-bold">U</span>
+                    </div>
+                    <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">Ultradeal</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Markets</a>
+                    <a href="#" class="font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Watchlist</a>
+                    <button disabled class="font-medium text-gray-400 cursor-not-allowed">Wallet (coming soon)</button>
+                    
+                    <!-- Language Selector -->
+                    <div class="language-selector relative">
+                        <button class="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-globe"></i>
+                            <span>English</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="language-dropdown hidden absolute right-0 mt-2 w-40 bg-white dark:bg-dark-800 rounded-md shadow-lg py-1 z-20">
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Farsi (فارسی)</a>
+                            <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">German (Deutsch)</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon hidden dark:block"></i>
+                        <i class="fas fa-sun block dark:hidden"></i>
+                    </button>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu md:hidden">
+                <div class="pt-4 pb-2 space-y-2">
+                    <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Markets</a>
+                    <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Watchlist</a>
+                    <button disabled class="block w-full text-left px-3 py-2 rounded-md text-gray-400 cursor-not-allowed">Wallet (coming soon)</button>
+                    
+                    <div class="flex items-center justify-between px-3 py-2">
+                        <!-- Language Selector Mobile -->
+                        <div class="language-selector relative">
+                            <button class="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-globe"></i>
+                                <span>English</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="language-dropdown hidden absolute left-0 mt-2 w-40 bg-white dark:bg-dark-800 rounded-md shadow-lg py-1 z-20">
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Farsi (فارسی)</a>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">German (Deutsch)</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Theme Toggle Mobile -->
+                        <button id="theme-toggle-mobile" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon hidden dark:block"></i>
+                            <i class="fas fa-sun block dark:hidden"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <div class="relative max-w-2xl mx-auto">
+                <input type="text" placeholder="Search for a crypto or stock..." 
+                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-800 transition-all">
+                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Crypto Section -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">Top Cryptocurrencies</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 rounded-md bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">All</button>
+                    <button class="px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Gainers</button>
+                    <button class="px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">Losers</button>
+                </div>
+            </div>
+            
+            <div class="bg-white dark:bg-dark-800 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">24h %</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Market Cap</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Last 7 Days</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crypto-table-body" class="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Loading state -->
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center">
+                                    <div class="flex justify-center items-center space-x-2">
+                                        <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Loading crypto data...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stocks Section -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold">Stock Market</h2>
+                <div class="flex space-x-2">
+                    <button id="sp500-btn" class="px-3 py-1 rounded-md bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">S&P 500</button>
+                    <button id="eurostoxx-btn" class="px-3 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">EURO STOXX 50</button>
+                </div>
+            </div>
+            
+            <!-- Heatmap Placeholder -->
+            <div id="heatmap-container" class="mb-8">
+                <div class="bg-white dark:bg-dark-800 rounded-xl shadow-sm overflow-hidden p-4">
+                    <div class="heatmap-placeholder rounded-lg h-64 flex items-center justify-center text-white font-bold text-xl">
+                        S&P 500 Heatmap (Interactive)
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Stocks -->
+            <div class="bg-white dark:bg-dark-800 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Symbol</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Change</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">% Change</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stocks-table-body" class="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Loading state -->
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center">
+                                    <div class="flex justify-center items-center space-x-2">
+                                        <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Loading stock data...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-dark-800 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                            <span class="text-white font-bold">U</span>
+                        </div>
+                        <span class="text-xl font-bold text-indigo-600 dark:text-indigo-400">Ultradeal</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400">Your ultimate destination for crypto and stock market data.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Markets</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Cryptocurrencies</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Stocks</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Commodities</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Forex</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">News</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Guides</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">API</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">Glossary</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            <i class="fab fa-discord text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-gray-500 dark:text-gray-400">
+                <p>&copy; 2023 Ultradeal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or use system preference
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        themeToggle.addEventListener('click', toggleTheme);
+        themeToggleMobile.addEventListener('click', toggleTheme);
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+        });
+        
+        // Language dropdown
+        const languageSelectors = document.querySelectorAll('.language-selector');
+        
+        languageSelectors.forEach(selector => {
+            const button = selector.querySelector('button');
+            const dropdown = selector.querySelector('.language-dropdown');
+            
+            button.addEventListener('click', () => {
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!selector.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Stock heatmap toggle
+        const sp500Btn = document.getElementById('sp500-btn');
+        const eurostoxxBtn = document.getElementById('eurostoxx-btn');
+        const heatmapContainer = document.getElementById('heatmap-container');
+        
+        sp500Btn.addEventListener('click', () => {
+            sp500Btn.classList.add('bg-indigo-100', 'dark:bg-indigo-900', 'text-indigo-700', 'dark:text-indigo-300');
+            sp500Btn.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            eurostoxxBtn.classList.remove('bg-indigo-100', 'dark:bg-indigo-900', 'text-indigo-700', 'dark:text-indigo-300');
+            eurostoxxBtn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            
+            heatmapContainer.innerHTML = `
+                <div class="bg-white dark:bg-dark-800 rounded-xl shadow-sm overflow-hidden p-4">
+                    <div class="heatmap-placeholder rounded-lg h-64 flex items-center justify-center text-white font-bold text-xl">
+                        S&P 500 Heatmap (Interactive)
+                    </div>
+                </div>
+            `;
+        });
+        
+        eurostoxxBtn.addEventListener('click', () => {
+            eurostoxxBtn.classList.add('bg-indigo-100', 'dark:bg-indigo-900', 'text-indigo-700', 'dark:text-indigo-300');
+            eurostoxxBtn.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            sp500Btn.classList.remove('bg-indigo-100', 'dark:bg-indigo-900', 'text-indigo-700', 'dark:text-indigo-300');
+            sp500Btn.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            
+            heatmapContainer.innerHTML = `
+                <div class="bg-white dark:bg-dark-800 rounded-xl shadow-sm overflow-hidden p-4">
+                    <div class="heatmap-placeholder rounded-lg h-64 flex items-center justify-center text-white font-bold text-xl">
+                        EURO STOXX 50 Heatmap (Interactive)
+                    </div>
+                </div>
+            `;
+        });
+        
+        // Fetch crypto data (simulated)
+        setTimeout(() => {
+            const cryptoTableBody = document.getElementById('crypto-table-body');
+            
+            // Simulated data - in a real app you would fetch from CoinGecko API
+            const cryptoData = [
+                { rank: 1, name: "Bitcoin", symbol: "BTC", price: "$29,458.32", change24h: "+2.34%", changeClass: "text-green-500", marketCap: "$572.5B", image: "https://cryptologos.cc/logos/bitcoin-btc-logo.png" },
+                { rank: 2, name: "Ethereum", symbol: "ETH", price: "$1,864.75", change24h: "+1.56%", changeClass: "text-green-500", marketCap: "$224.1B", image: "https://cryptologos.cc/logos/ethereum-eth-logo.png" },
+                { rank: 3, name: "Tether", symbol: "USDT", price: "$1.00", change24h: "0.00%", changeClass: "text-gray-500", marketCap: "$83.4B", image: "https://cryptologos.cc/logos/tether-usdt-logo.png" },
+                { rank: 4, name: "BNB", symbol: "BNB", price: "$241.68", change24h: "-0.87%", changeClass: "text-red-500", marketCap: "$37.2B", image: "https://cryptologos.cc/logos/bnb-bnb-logo.png" },
+                { rank: 5, name: "XRP", symbol: "XRP", price: "$0.7045", change24h: "+5.23%", changeClass: "text-green-500", marketCap: "$37.1B", image: "https://cryptologos.cc/logos/xrp-xrp-logo.png" },
+                { rank: 6, name: "Cardano", symbol: "ADA", price: "$0.2987", change24h: "-1.45%", changeClass: "text-red-500", marketCap: "$10.5B", image: "https://cryptologos.cc/logos/cardano-ada-logo.png" },
+                { rank: 7, name: "Dogecoin", symbol: "DOGE", price: "$0.0792", change24h: "+3.21%", changeClass: "text-green-500", marketCap: "$10.4B", image: "https://cryptologos.cc/logos/dogecoin-doge-logo.png" },
+                { rank: 8, name: "Polygon", symbol: "MATIC", price: "$0.6854", change24h: "-2.12%", changeClass: "text-red-500", marketCap: "$6.4B", image: "https://cryptologos.cc/logos/polygon-matic-logo.png" },
+                { rank: 9, name: "Solana", symbol: "SOL", price: "$23.45", change24h: "+0.67%", changeClass: "text-green-500", marketCap: "$9.5B", image: "https://cryptologos.cc/logos/solana-sol-logo.png" },
+                { rank: 10, name: "Polkadot", symbol: "DOT", price: "$5.21", change24h: "-0.34%", changeClass: "text-red-500", marketCap: "$6.1B", image: "https://cryptologos.cc/logos/polkadot-new-dot-logo.png" }
+            ];
+            
+            cryptoTableBody.innerHTML = '';
+            
+            cryptoData.forEach(crypto => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">${crypto.rank}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-8 w-8">
+                                <img class="h-8 w-8 rounded-full" src="${crypto.image}" alt="${crypto.name}">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-200">${crypto.name}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">${crypto.symbol}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${crypto.price}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm ${crypto.changeClass}">${crypto.change24h}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${crypto.marketCap}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="h-10 w-32 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                    </td>
+                `;
+                
+                cryptoTableBody.appendChild(row);
+            });
+        }, 1500);
+        
+        // Fetch stock data (simulated)
+        setTimeout(() => {
+            const stocksTableBody = document.getElementById('stocks-table-body');
+            
+            // Simulated data - in a real app you would fetch from Alpha Vantage API
+            const stockData = [
+                { symbol: "AAPL", name: "Apple Inc.", price: "$193.97", change: "+1.25", changePct: "+0.65%", changeClass: "text-green-500", volume: "48.5M" },
+                { symbol: "MSFT", name: "Microsoft Corporation", price: "$337.41", change: "-2.34", changePct: "-0.69%", changeClass: "text-red-500", volume: "18.2M" },
+                { symbol: "AMZN", name: "Amazon.com Inc.", price: "$134.95", change: "+3.21", changePct: "+2.44%", changeClass: "text-green-500", volume: "32.7M" },
+                { symbol: "GOOGL", name: "Alphabet Inc.", price: "$132.56", change: "+0.87", changePct: "+0.66%", changeClass: "text-green-500", volume: "21.9M" },
+                { symbol: "META", name: "Meta Platforms Inc.", price: "$298.61", change: "-5.42", changePct: "-1.78%", changeClass: "text-red-500", volume: "15.3M" },
+                { symbol: "TSLA", name: "Tesla Inc.", price: "$265.28", change: "+12.45", changePct: "+4.93%", changeClass: "text-green-500", volume: "112.4M" },
+                { symbol: "NVDA", name: "NVIDIA Corporation", price: "$459.77", change: "+23.51", changePct: "+5.39%", changeClass: "text-green-500", volume: "45.2M" },
+                { symbol: "JPM", name: "JPMorgan Chase & Co.", price: "$156.34", change: "+1.23", changePct: "+0.79%", changeClass: "text-green-500", volume: "8.7M" },
+                { symbol: "V", name: "Visa Inc.", price: "$250.12", change: "-2.45", changePct: "-0.97%", changeClass: "text-red-500", volume: "6.3M" },
+                { symbol: "WMT", name: "Walmart Inc.", price: "$161.78", change: "+0.56", changePct: "+0.35%", changeClass: "text-green-500", volume: "5.9M" }
+            ];
+            
+            stocksTableBody.innerHTML = '';
+            
+            stockData.forEach(stock => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">${stock.symbol}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${stock.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${stock.price}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm ${stock.changeClass}">${stock.change}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm ${stock.changeClass}">${stock.changePct}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${stock.volume}</td>
+                `;
+                
+                stocksTableBody.appendChild(row);
+            });
+        }, 2000);
+    </script>
+</body>
+</html>
