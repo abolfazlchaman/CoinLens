@@ -57,7 +57,7 @@ export default function About() {
                 <span>GitHub</span>
               </a>
               <a
-                href='mailto:contact@coinlens.info'
+                href='mailto:help@coinlens.info'
                 className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors'>
                 <Mail className='w-5 h-5' />
                 <span>Email</span>

@@ -38,7 +38,7 @@ const footerLinks: LinkGroup[] = [
     title: 'Connect',
     links: [
       { name: 'GitHub', href: 'https://github.com/abolfazlchaman/coinlens', icon: Github },
-      { name: 'Email', href: 'mailto:contact@coinlens.info', icon: Mail },
+      { name: 'Email', href: 'mailto:help@coinlens.info', icon: Mail },
       { name: 'Creator', href: 'https://abolfazlchaman.com/en', icon: Globe },
     ],
   },
