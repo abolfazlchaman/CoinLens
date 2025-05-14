@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, Linkedin, ExternalLink, Mail, LucideIcon } from 'lucide-react';
+import { Github, Twitter, ExternalLink, Mail, LucideIcon, Globe } from 'lucide-react';
 
 interface BaseLink {
   name: string;
@@ -37,9 +37,9 @@ const footerLinks: LinkGroup[] = [
   {
     title: 'Connect',
     links: [
-      { name: 'GitHub', href: 'https://github.com/abolfazlchaman', icon: Github },
-      { name: 'LinkedIn', href: 'https://linkedin.com/in/abolfazlchaman', icon: Linkedin },
-      { name: 'Email', href: 'mailto:contact@abolfazlchaman.com', icon: Mail },
+      { name: 'GitHub', href: 'https://github.com/abolfazlchaman/coinlens', icon: Github },
+      { name: 'Email', href: 'mailto:contact@coinlens.info', icon: Mail },
+      { name: 'Creator', href: 'https://abolfazlchaman.com/en', icon: Globe },
     ],
   },
 ];

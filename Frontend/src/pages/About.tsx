@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Globe } from 'lucide-react';
+import { Github, Mail, Globe } from 'lucide-react';
 
 export default function About() {
   return (
@@ -41,15 +41,15 @@ export default function About() {
             </p>
             <div className='flex flex-wrap gap-4'>
               <a
-                href='https://abolfazlchaman.com'
+                href='https://abolfazlchaman.com/en'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors'>
                 <Globe className='w-5 h-5' />
-                <span>Website</span>
+                <span>Creator's Website</span>
               </a>
               <a
-                href='https://github.com/abolfazlchaman'
+                href='https://github.com/abolfazlchaman/coinlens'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors'>
@@ -57,15 +57,7 @@ export default function About() {
                 <span>GitHub</span>
               </a>
               <a
-                href='https://linkedin.com/in/abolfazlchaman'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors'>
-                <Linkedin className='w-5 h-5' />
-                <span>LinkedIn</span>
-              </a>
-              <a
-                href='mailto:contact@abolfazlchaman.com'
+                href='mailto:contact@coinlens.info'
                 className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors'>
                 <Mail className='w-5 h-5' />
                 <span>Email</span>
