@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/axios": "^0.14.4",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
