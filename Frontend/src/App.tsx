@@ -1,6 +1,7 @@
 import { ThemeProvider } from './components/theme-provider';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CryptoNews from './components/CryptoNews';
@@ -79,6 +80,10 @@ export default function App() {
             />
           </Routes>
           <Footer />
+          <Toaster
+            richColors
+            position='top-right'
+          />
         </div>
       </LanguageProvider>
     </ThemeProvider>

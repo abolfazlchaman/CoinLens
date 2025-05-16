@@ -15,6 +15,7 @@ export default function MarketSentiment() {
   const [sentiment, setSentiment] = useState<MarketSentiment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPriceAlerts, setShowPriceAlerts] = useState(false);
 
   useEffect(() => {
     const fetchSentiment = async () => {
@@ -69,9 +70,11 @@ export default function MarketSentiment() {
         <div className='space-y-8'>
           <div className='flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0'>
             <h2 className='text-3xl font-bold'>Market Sentiment</h2>
-            <Button className='w-full lg:w-auto'>
+            <Button
+              onClick={() => setShowPriceAlerts(!showPriceAlerts)}
+              className='w-full lg:w-auto'>
               <Bell className='mr-2 h-4 w-4' />
-              Create Price Alert
+              {showPriceAlerts ? 'Hide Price Alerts' : 'Create Price Alert'}
             </Button>
           </div>
 
@@ -121,7 +124,16 @@ export default function MarketSentiment() {
                 <Bell className='h-4 w-4 text-muted-foreground' />
               </div>
               <div className='flex flex-col items-center justify-center space-y-4'>
-                <PriceAlerts />
+                {showPriceAlerts ? (
+                  <PriceAlerts />
+                ) : (
+                  <div className='text-center text-muted-foreground'>
+                    <p>Click the button above to create price alerts</p>
+                    <p className='text-sm mt-2'>
+                      Get notified when your favorite cryptocurrencies reach your target prices
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorBoundary } from './ErrorBoundary';
+import { toast } from 'sonner';
 
 interface PriceAlert {
   id: string;
@@ -13,6 +14,12 @@ interface PriceAlert {
   isTriggered: boolean;
 }
 
+interface Coin {
+  id: string;
+  name: string;
+  symbol: string;
+}
+
 export function PriceAlerts() {
   const [alerts, setAlerts] = useState<PriceAlert[]>([]);
   const [selectedCoin, setSelectedCoin] = useState('');
@@ -20,7 +27,27 @@ export function PriceAlerts() {
   const [isAbove, setIsAbove] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [coins, setCoins] = useState<Array<{ id: string; name: string; symbol: string }>>([]);
+  const [coins, setCoins] = useState<Coin[]>([]);
+  const [notificationPermission, setNotificationPermission] =
+    useState<NotificationPermission>('default');
+
+  useEffect(() => {
+    // Request notification permission when component mounts
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission().then((permission) => {
+          setNotificationPermission(permission);
+          if (permission === 'granted') {
+            toast.success(
+              'Notifications enabled! You will receive alerts when prices hit your targets.',
+            );
+          }
+        });
+      } else {
+        setNotificationPermission(Notification.permission);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -52,11 +79,22 @@ export function PriceAlerts() {
 
       try {
         const updatedAlerts = await Promise.all(
-          alerts.map(async (alert) => {
+          alerts.map(async (alert: PriceAlert) => {
             const price = await cryptoApi.getCoinPrice(alert.coinId);
             const isTriggered =
               (alert.isAbove && price >= alert.targetPrice) ||
               (!alert.isAbove && price <= alert.targetPrice);
+
+            // Show notification if alert is triggered
+            if (isTriggered && notificationPermission === 'granted' && !alert.isTriggered) {
+              new Notification('Price Alert Triggered!', {
+                body: `${alert.coinName} is now ${alert.isAbove ? 'above' : 'below'} $${
+                  alert.targetPrice
+                }`,
+                icon: '/favicon.ico',
+              });
+            }
+
             return {
               ...alert,
               currentPrice: price,
@@ -74,12 +112,12 @@ export function PriceAlerts() {
     updateAlertPrices();
     const interval = setInterval(updateAlertPrices, 60 * 1000); // Update every minute
     return () => clearInterval(interval);
-  }, [alerts]);
+  }, [alerts, notificationPermission]);
 
   const handleAddAlert = () => {
     if (!selectedCoin || !targetPrice) return;
 
-    const coin = coins.find((c) => c.id === selectedCoin);
+    const coin = coins.find((c: Coin) => c.id === selectedCoin);
     if (!coin) return;
 
     const newAlert: PriceAlert = {
@@ -92,13 +130,17 @@ export function PriceAlerts() {
       isTriggered: false,
     };
 
-    setAlerts([...alerts, newAlert]);
+    setAlerts((prevAlerts: PriceAlert[]) => [...prevAlerts, newAlert]);
     setSelectedCoin('');
     setTargetPrice('');
+    toast.success('Price alert created successfully!');
   };
 
   const handleDeleteAlert = (id: string) => {
-    setAlerts(alerts.filter((alert) => alert.id !== id));
+    setAlerts((prevAlerts: PriceAlert[]) =>
+      prevAlerts.filter((alert: PriceAlert) => alert.id !== id),
+    );
+    toast.success('Price alert deleted successfully!');
   };
 
   if (loading) {
