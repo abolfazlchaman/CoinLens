@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
-import { TrendingUp, TrendingDown, Minus, Bell } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Bell, Angry, Meh } from 'lucide-react';
 import { Button } from './ui/button';
 import PriceAlerts from './PriceAlerts';
 
@@ -59,8 +59,8 @@ export default function MarketSentiment() {
 
   const getSentimentIcon = (value: number) => {
     if (value >= 75) return <TrendingUp className='h-4 w-4 text-green-500' />;
-    if (value >= 50) return <Minus className='h-4 w-4 text-yellow-500' />;
-    if (value >= 25) return <Minus className='h-4 w-4 text-orange-500' />;
+    if (value >= 50) return <Meh className='h-4 w-4 text-yellow-500' />;
+    if (value >= 25) return <Angry className='h-4 w-4 text-orange-500' />;
     return <TrendingDown className='h-4 w-4 text-red-500' />;
   };
 
@@ -85,7 +85,7 @@ export default function MarketSentiment() {
                 <div>
                   <h3 className='font-medium'>Fear & Greed Index</h3>
                   <p className='text-sm text-muted-foreground'>
-                    Last updated: {new Date(sentiment.timestamp).toLocaleString()}
+                    Last updated:{sentiment.timestamp}
                   </p>
                 </div>
                 {getSentimentIcon(sentimentValue)}
