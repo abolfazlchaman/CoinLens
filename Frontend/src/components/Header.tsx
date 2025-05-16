@@ -78,7 +78,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className='hidden md:flex md:items-center md:space-x-8'>
+          <div className='hidden lg:flex lg:items-center lg:space-x-8'>
             {navigation.map((item) => (
               <button
                 key={item.name}
@@ -116,7 +116,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden'>
+              className='rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden'>
               {isMobileMenuOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
             </button>
           </div>
@@ -124,7 +124,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className='md:hidden w-full min-h-screen'>
+          <div className='lg:hidden w-full min-h-screen'>
             <div className='space-y-1 px-2 pb-3 pt-2'>
               {navigation.map((item) => (
                 <button
