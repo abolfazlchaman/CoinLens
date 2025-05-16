@@ -8,8 +8,7 @@ export default function Hero() {
       <div
         className='absolute inset-0 bg-cover bg-center bg-no-repeat'
         style={{
-          backgroundImage:
-            'url("https://images.unsplash.com/photo-1518546305927-5a555bb7020d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80")',
+          backgroundImage: 'url("/images/hero.avif")',
           filter: 'brightness(0.3)',
         }}
       />
@@ -31,47 +30,34 @@ export default function Hero() {
         </p>
 
         {/* Feature Badges */}
-        <div className='mb-8 flex flex-wrap items-center justify-center gap-4'>
-          <div className='flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-2 text-sm text-green-500'>
-            <CheckCircle2 className='h-4 w-4' />
-            <span>100% Free</span>
-          </div>
-          <div className='flex items-center gap-2 rounded-full bg-blue-500/10 px-4 py-2 text-sm text-blue-500'>
-            <CheckCircle2 className='h-4 w-4' />
+        <div className='mb-8 flex flex-wrap justify-center gap-4'>
+          <div className='flex items-center space-x-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm'>
+            <CheckCircle2 className='h-4 w-4 text-primary' />
             <span>Real-time Data</span>
           </div>
-          <div className='flex items-center gap-2 rounded-full bg-purple-500/10 px-4 py-2 text-sm text-purple-500'>
-            <CheckCircle2 className='h-4 w-4' />
-            <span>100% Accurate</span>
+          <div className='flex items-center space-x-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm'>
+            <CheckCircle2 className='h-4 w-4 text-primary' />
+            <span>Portfolio Tracking</span>
+          </div>
+          <div className='flex items-center space-x-2 rounded-full bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm'>
+            <CheckCircle2 className='h-4 w-4 text-primary' />
+            <span>Price Alerts</span>
           </div>
         </div>
 
+        {/* CTA Buttons */}
         <div className='flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0'>
           <Link
-            to='/'
-            onClick={() => {
-              const element = document.querySelector('#market-heatmap');
-              if (element) {
-                const headerOffset = 80;
-                const elementPosition = element.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                window.scrollTo({
-                  top: offsetPosition,
-                  behavior: 'smooth',
-                });
-              }
-            }}
-            className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90'>
-            Latest changes
+            to='#market-heatmap'
+            className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'>
+            Explore Market
             <ArrowRight className='ml-2 h-4 w-4' />
           </Link>
-          <a
-            href='https://www.coingecko.com/learn'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='inline-flex items-center justify-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium text-dark transition-colors hover:bg-muted hover:text-muted-foreground'>
-            Learn Trading from the best!
-          </a>
+          <Link
+            to='/about'
+            className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-base font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2'>
+            Learn More
+          </Link>
         </div>
       </div>
     </div>
