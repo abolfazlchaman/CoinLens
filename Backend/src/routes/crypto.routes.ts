@@ -11,6 +11,15 @@ router.use((req, res, next) => {
   next();
 });
 
+// Health check route for keeping the API alive
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 // Get market data
 router.get('/market-data', async (req, res, next) => {
   try {
