@@ -25,8 +25,7 @@ const newsItems = [
     title: 'Bitcoin Surges Past $50,000 as Institutional Adoption Grows',
     description:
       'Major financial institutions continue to show interest in Bitcoin, driving the price to new heights.',
-    image:
-      'https://images.unsplash.com/photo-1559526324-593bc073d938?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fHRyYWRlfGVufDB8fDB8fHwwauto=format&fit=crop&w=1169&q=80',
+    image: '/images/news1.avif',
     date: getRecentDate(1),
     source: 'Crypto Daily',
   },
@@ -34,8 +33,7 @@ const newsItems = [
     title: 'Ethereum 2.0 Upgrade Shows Promising Results',
     description:
       'The latest upgrade to Ethereum network demonstrates significant improvements in scalability and efficiency.',
-    image:
-      'https://images.unsplash.com/photo-1639762681057-408e52192e55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
+    image: '/images/news2.avif',
     date: getRecentDate(2),
     source: 'ETH News',
   },
@@ -43,8 +41,7 @@ const newsItems = [
     title: 'New DeFi Protocol Launches with Revolutionary Features',
     description:
       'A groundbreaking DeFi platform introduces innovative yield farming mechanisms and enhanced security measures.',
-    image:
-      'https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHN0b2NrJTIwdHJhZGluZ3xlbnwwfHwwfHx8MA%3D%3Dauto=format&fit=crop&w=1169&q=80',
+    image: '/images/news3.avif',
     date: getRecentDate(3),
     source: 'DeFi Times',
   },
@@ -52,8 +49,7 @@ const newsItems = [
     title: 'Solana Network Achieves Record-Breaking Transaction Speed',
     description:
       'Solana blockchain demonstrates unprecedented performance, processing over 65,000 transactions per second.',
-    image:
-      'https://images.unsplash.com/photo-1660062993695-9c81acfaceeb?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8c29sYW5hfGVufDB8fDB8fHwwauto=format&fit=crop&w=1169&q=80',
+    image: '/images/news4.avif',
     date: getRecentDate(4),
     source: 'Blockchain Times',
   },
@@ -61,8 +57,7 @@ const newsItems = [
     title: 'Major Bank Announces Crypto Custody Services',
     description:
       'Traditional financial institution enters the crypto space with secure custody solutions for institutional clients.',
-    image:
-      'https://images.unsplash.com/photo-1707761918029-1295034aa31e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Zm9yZXh8ZW58MHx8MHx8fDA%3Dauto=format&fit=crop&w=1169&q=80',
+    image: '/images/news5.avif',
     date: getRecentDate(5),
     source: 'Finance Daily',
   },
@@ -70,8 +65,7 @@ const newsItems = [
     title: 'NFT Market Sees Surge in Digital Art Sales',
     description:
       'Digital art marketplace reports record-breaking sales as NFT adoption continues to grow across industries.',
-    image:
-      'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80',
+    image: '/images/news6.avif',
     date: getRecentDate(6),
     source: 'NFT Insider',
   },
