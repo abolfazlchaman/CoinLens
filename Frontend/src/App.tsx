@@ -17,6 +17,7 @@ import FAQ from './pages/FAQ';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Disclaimer from './pages/Disclaimer';
+import { Analytics } from '@vercel/analytics/react';
 
 function Home() {
   return (
@@ -86,6 +87,7 @@ export default function App() {
           />
         </div>
       </LanguageProvider>
+      <Analytics />
     </ThemeProvider>
   );
 }
