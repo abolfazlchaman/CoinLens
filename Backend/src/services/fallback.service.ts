@@ -72,11 +72,37 @@ export class FallbackService {
   }
 
   public async getCoinPrice(coinId: string): Promise<number> {
-    const prices: { [key: string]: number } = {
-      bitcoin: 50000,
-      ethereum: 3000,
-    };
-    return prices[coinId] || 0;
+    try {
+      // Try to get the price from the cached market data first
+      const marketData = await this.getMarketData();
+      const coin = marketData.find((coin) => coin.id === coinId);
+      if (coin) {
+        return coin.current_price;
+      }
+
+      // If not found in market data, try to get from global data
+      const globalData = await this.getGlobalData();
+      if (globalData.data.market_cap_percentage[coinId]) {
+        // If we have market cap percentage, we can estimate the price
+        // This is a fallback estimation and should be used with caution
+        const totalMarketCap = globalData.data.total_market_cap.usd;
+        const marketCapPercentage = globalData.data.market_cap_percentage[coinId];
+        const estimatedMarketCap = (totalMarketCap * marketCapPercentage) / 100;
+        
+        // Get circulating supply from market data if available
+        const coinData = marketData.find((c) => c.id === coinId);
+        const circulatingSupply = coinData?.circulating_supply || 0;
+        if (circulatingSupply > 0) {
+          return estimatedMarketCap / circulatingSupply;
+        }
+      }
+
+      logger.warn(`No fallback price data available for ${coinId}`);
+      return 0;
+    } catch (error) {
+      logger.error(`Error getting fallback price for ${coinId}:`, error);
+      return 0;
+    }
   }
 
   public async getExchanges(): Promise<Exchange[]> {
