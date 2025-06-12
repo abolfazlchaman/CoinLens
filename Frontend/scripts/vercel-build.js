@@ -13,25 +13,28 @@ try {
   fs.mkdirSync(outputDir, { recursive: true });
   fs.mkdirSync(staticDir, { recursive: true });
 
-  // Read and process sitemap.xml
+  // Read sitemap.xml
   const sitemapSource = path.join(process.cwd(), 'public', 'sitemap.xml');
   console.log('Reading sitemap source...');
   if (!fs.existsSync(sitemapSource)) {
     throw new Error('sitemap.xml not found in public directory');
   }
 
-  const sitemapContent = fs.readFileSync(sitemapSource, 'utf8');
+  // Copy original sitemap.xml
+  console.log('Copying sitemap.xml...');
+  fs.copyFileSync(sitemapSource, path.join(staticDir, 'sitemap.xml'));
 
-  // Write uncompressed version
-  console.log('Writing uncompressed sitemap.xml...');
-  fs.writeFileSync(path.join(staticDir, 'sitemap.xml'), sitemapContent);
-
-  // Create gzipped version
-  console.log('Creating gzipped version...');
+  // Generate compressed version using zlib
+  console.log('Generating compressed sitemap...');
+  const sitemapContent = fs.readFileSync(sitemapSource);
   const gzippedContent = zlib.gzipSync(sitemapContent);
   fs.writeFileSync(path.join(staticDir, 'sitemap.xml.gz'), gzippedContent);
 
-  // Create config.json with proper headers for both versions
+  // Get file sizes for Content-Length headers
+  const xmlSize = fs.statSync(path.join(staticDir, 'sitemap.xml')).size;
+  const gzipSize = gzippedContent.length;
+
+  // Create config.json with proper headers
   const config = {
     version: 3,
     overrides: {
@@ -39,17 +42,17 @@ try {
         contentType: 'application/xml',
         headers: {
           'Content-Type': 'application/xml',
-          'Cache-Control': 'public, max-age=3600',
-          'Content-Length': Buffer.byteLength(sitemapContent).toString(),
+          'Content-Length': xmlSize.toString(),
+          'Cache-Control': 'public, max-age=86400',
         },
       },
       'static/sitemap.xml.gz': {
-        contentType: 'application/gzip',
+        contentType: 'application/xml',
         headers: {
-          'Content-Type': 'application/gzip',
+          'Content-Type': 'application/xml',
           'Content-Encoding': 'gzip',
-          'Cache-Control': 'public, max-age=3600',
-          'Content-Length': gzippedContent.length.toString(),
+          'Content-Length': gzipSize.toString(),
+          'Cache-Control': 'public, max-age=86400',
         },
       },
     },
