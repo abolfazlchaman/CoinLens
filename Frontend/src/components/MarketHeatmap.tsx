@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { useTheme } from 'next-themes';
 
 interface MarketData {
   id: string;
@@ -15,6 +17,9 @@ export default function MarketHeatmap() {
   const [marketData, setMarketData] = useState<MarketData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const heatmapRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchMarketData = async () => {
@@ -31,6 +36,90 @@ export default function MarketHeatmap() {
 
     fetchMarketData();
   }, []);
+
+  const handleDownload = async () => {
+    if (!heatmapRef.current) return;
+
+    setIsDownloading(true);
+    try {
+      // Create a temporary container for the capture
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
+      container.style.backgroundColor = theme === 'dark' ? '#0f172a' : '#ffffff';
+      container.style.display = 'flex';
+      container.style.flexDirection = 'column';
+      container.style.width = '1920px'; // Standard width for good quality
+      container.style.height = 'auto';
+      container.style.minHeight = '1080px';
+
+      // Create navbar watermark
+      const navbar = document.createElement('div');
+      navbar.style.width = '100%';
+      navbar.style.padding = '1rem 2rem';
+      navbar.style.backgroundColor =
+        theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+      navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+      navbar.style.display = 'flex';
+      navbar.style.justifyContent = 'space-between';
+      navbar.style.alignItems = 'center';
+      navbar.style.color = theme === 'dark' ? '#ffffff' : '#000000';
+      navbar.style.fontSize = '0.875rem';
+
+      const poweredBy = document.createElement('span');
+      poweredBy.textContent = 'Powered by coinlens.info';
+      const timestamp = document.createElement('span');
+      timestamp.textContent = new Date().toLocaleString();
+
+      navbar.appendChild(poweredBy);
+      navbar.appendChild(timestamp);
+
+      // Create content container
+      const contentContainer = document.createElement('div');
+      contentContainer.style.flex = '1';
+      contentContainer.style.padding = '2rem';
+      contentContainer.style.display = 'flex';
+      contentContainer.style.flexDirection = 'column';
+      contentContainer.style.gap = '1.5rem';
+
+      // Clone the heatmap content
+      const heatmapClone = heatmapRef.current.cloneNode(true) as HTMLElement;
+      heatmapClone.style.width = '100%';
+      heatmapClone.style.height = 'auto';
+      heatmapClone.style.display = 'grid';
+      heatmapClone.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
+      heatmapClone.style.gap = '1rem';
+      heatmapClone.style.alignItems = 'stretch';
+
+      // Assemble the container
+      contentContainer.appendChild(heatmapClone);
+      container.appendChild(navbar);
+      container.appendChild(contentContainer);
+      document.body.appendChild(container);
+
+      const canvas = await html2canvas(container, {
+        scale: 2, // Higher quality
+        width: 1920,
+        height: container.offsetHeight,
+        backgroundColor: theme === 'dark' ? '#0f172a' : '#ffffff',
+        logging: false,
+        useCORS: true,
+      });
+
+      // Clean up
+      document.body.removeChild(container);
+
+      const link = document.createElement('a');
+      link.download = `coinlens.info-market-heatmap-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('Failed to download heatmap:', err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -60,9 +149,20 @@ export default function MarketHeatmap() {
     <div className='w-full bg-muted/50 py-16'>
       <div className='container mx-auto px-4'>
         <div className='space-y-8'>
-          <h2 className='text-3xl font-bold'>Market Heatmap</h2>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-3xl font-bold'>Market Heatmap</h2>
+            <button
+              className='btn btn-primary gap-2 flex flex-row'
+              onClick={handleDownload}
+              disabled={isDownloading}>
+              <Download className='h-4 w-4' />
+              {isDownloading ? 'Downloading...' : '4K Heatmap Picture'}
+            </button>
+          </div>
 
-          <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'>
+          <div
+            ref={heatmapRef}
+            className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'>
             {marketData.map((coin) => {
               const priceChange = coin.price_change_percentage_24h;
               const colorClass = getPriceChangeColor(priceChange);
