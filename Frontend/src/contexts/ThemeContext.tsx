@@ -18,7 +18,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'crypto-man-theme',
+  storageKey = 'coinlens-theme',
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {

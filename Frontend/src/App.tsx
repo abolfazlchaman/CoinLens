@@ -18,6 +18,9 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Disclaimer from './pages/Disclaimer';
 import { Analytics } from '@vercel/analytics/react';
+import Features from './components/Features';
+import Testimonials from './components/Testimonials';
+import HomeFAQ from './components/HomeFAQ';
 
 function Home() {
   return (
@@ -41,6 +44,9 @@ function Home() {
         <section id='crypto-news'>
           <CryptoNews />
         </section>
+        <Features />
+        <Testimonials />
+        <HomeFAQ />
       </main>
     </>
   );
@@ -50,7 +56,7 @@ export default function App() {
   return (
     <ThemeProvider
       defaultTheme='dark'
-      storageKey='crypto-man-theme'>
+      storageKey='coinlens-theme'>
       <LanguageProvider>
         <div className='min-h-screen bg-background font-sans antialiased'>
           <Header />

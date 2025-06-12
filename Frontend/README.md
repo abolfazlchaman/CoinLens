@@ -30,8 +30,8 @@ A modern cryptocurrency tracking application built with React, TypeScript, and T
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/crypto-man.git
-   cd crypto-man
+   git clone https://github.com/abolfazlchaman/coinlens
+   cd coinlens
    ```
 
 2. Install dependencies:

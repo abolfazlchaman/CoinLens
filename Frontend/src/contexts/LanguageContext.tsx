@@ -11,12 +11,12 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(() => {
-    const savedLanguage = localStorage.getItem('crypto-man-language');
+    const savedLanguage = localStorage.getItem('coinlens-language');
     return (savedLanguage as Language) || 'en';
   });
 
   useEffect(() => {
-    localStorage.setItem('crypto-man-language', language);
+    localStorage.setItem('coinlens-language', language);
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'fa' ? 'rtl' : 'ltr';
   }, [language]);

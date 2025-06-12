@@ -99,8 +99,8 @@ pnpm start
 
 ### Docker Deployment
 ```bash
-docker build -t crypto-man-backend .
-docker run -p 3001:3001 crypto-man-backend
+docker build -t coinlens-backend .
+docker run -p 3001:3001 coinlens-backend
 ```
 
 ## Error Handling

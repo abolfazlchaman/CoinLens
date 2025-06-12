@@ -1,6 +1,6 @@
 {
-  "name": "crypto-man",
-  "version": "0.1.0",
+  "name": "coinlens",
+  "version": "1.2.0",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^2.1.1",

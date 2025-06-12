@@ -1,6 +1,6 @@
 {
-  "name": "crypto-man-backend",
-  "version": "1.0.0",
+  "name": "coinlens-backend",
+  "version": "1.2.4",
   "description": "Backend service for CoinLens with CoinGecko API integration and Redis caching",
   "main": "dist/index.js",
   "scripts": {

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: crypto-man-backend
+    name: coinlens-backend
     env: node
     buildCommand: pnpm install && pnpm build
     startCommand: pnpm start
@@ -11,7 +11,7 @@ services:
         value: 3001
       - key: REDIS_URL
         fromDatabase:
-          name: crypto-man-redis
+          name: coinlens-redis
           property: connectionString
       - key: COINGECKO_API_KEY
         sync: false
@@ -31,6 +31,6 @@ services:
         value: 3600
 
 databases:
-  - name: crypto-man-redis
-    databaseName: crypto-man-redis
+  - name: coinlens-redis
+    databaseName: coinlens-redis
     plan: free 

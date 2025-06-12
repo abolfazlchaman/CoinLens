@@ -22,7 +22,7 @@ A modern cryptocurrency tracking application with real-time data from CoinGecko 
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd crypto-man
+   cd coinlens
    ```
 
 2. Run the application:
