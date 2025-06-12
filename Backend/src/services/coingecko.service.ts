@@ -144,6 +144,8 @@ export class CoinGeckoService {
       // Try cache first
       const cached = await this.getCachedData<T>(cacheKey);
       if (cached) {
+        // Update fallback data with cached data
+        await fallbackService.updateFallbackData(cacheKey, cached);
         return cached;
       }
 
@@ -156,17 +158,17 @@ export class CoinGeckoService {
             'Content-Type': 'application/json',
           },
         });
-      const data = response.data;
-      
-      // Cache the result
-      await this.setCachedData(cacheKey, data);
-      return data;
+        const data = response.data;
+        
+        // Cache the result
+        await this.setCachedData(cacheKey, data);
+        // Update fallback data with fresh API response
+        await fallbackService.updateFallbackData(cacheKey, data);
+        return data;
       } catch (apiError: any) {
         if (apiError.response?.status === 429) {
           logger.warn('Rate limit hit, using fallback data');
-          // Cache the fallback data to prevent immediate retries
           const fallback = await fallbackData();
-          await this.setCachedData(cacheKey, fallback);
           return fallback;
         }
         throw apiError;
