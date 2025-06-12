@@ -1,13 +1,14 @@
 import express from 'express';
 import { CoinGeckoService } from '../services/coingecko.service';
 import { fallbackService } from '../services/fallback.service';
+import { logger } from '../utils/logger';
 
 const router = express.Router();
 const coinGeckoService = CoinGeckoService.getInstance();
 
 // Middleware to log all requests
 router.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  logger.info(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
@@ -20,29 +21,46 @@ router.get('/health', (req, res) => {
   });
 });
 
+// Error handling middleware
+const handleError = (error: any, res: express.Response) => {
+  logger.error('API Error:', error);
+  // Always try to use fallback data
+  return true;
+};
+
 // Get market data
-router.get('/market-data', async (req, res, next) => {
+router.get('/market-data', async (req, res) => {
   try {
-    console.log('Fetching market data...');
+    logger.info('Fetching market data...');
     const data = await coinGeckoService.getMarketData();
-    console.log('Market data fetched successfully:', { count: data.length });
+    logger.info('Market data fetched successfully:', { count: data.length });
     res.json(data);
   } catch (error) {
-    console.error('Error fetching market data:', error);
-    next(error);
+    try {
+      logger.warn('Using fallback market data');
+      const fallbackData = await fallbackService.getMarketData();
+      res.json(fallbackData);
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch market data',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
 // Get global data
-router.get('/global-data', async (req, res, next) => {
+router.get('/global-data', async (req, res) => {
   try {
-    console.log('Fetching global data...');
+    logger.info('Fetching global data...');
     const data = await coinGeckoService.getGlobalData();
     // Flatten the data property
     if (data && data.data) {
       res.json({
         ...data.data,
-        active_cryptocurrencies: 10000, // You can fetch or mock these as needed
+        active_cryptocurrencies: 10000,
         upcoming_icos: 50,
         ongoing_icos: 100,
         ended_icos: 500,
@@ -53,92 +71,135 @@ router.get('/global-data', async (req, res, next) => {
       res.json(data);
     }
   } catch (error) {
-    console.error('Error fetching global data:', error);
-    next(error);
+    try {
+      logger.warn('Using fallback global data');
+      const fallbackData = await fallbackService.getGlobalData();
+      res.json(fallbackData);
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch global data',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
 // Get trending coins
-router.get('/trending-coins', async (req, res, next) => {
+router.get('/trending-coins', async (req, res) => {
   try {
-    console.log('Fetching trending coins...');
+    logger.info('Fetching trending coins...');
     const data = await coinGeckoService.getTrendingCoins();
-    // Return the full trending coins array
+    logger.info('Trending coins fetched successfully:', { count: data.length });
     res.json(data);
   } catch (error) {
-    console.error('Error fetching trending coins:', error);
-    next(error);
+    try {
+      logger.warn('Using fallback trending coins data');
+      const fallbackData = await fallbackService.getTrendingCoins();
+      res.json(fallbackData);
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch trending coins',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
-// Get specific coin price
-router.get('/coin-price/:id', async (req, res, next) => {
+// Get coin price
+router.get('/price/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log(`Fetching price for coin: ${id}`);
-    const data = await coinGeckoService.getCoinPrice(id);
-    console.log(`Price fetched successfully for ${id}:`, data);
+    const coinId = req.params.id;
+    logger.info(`Fetching price for coin: ${coinId}`);
+    const data = await coinGeckoService.getCoinPrice(coinId);
+    logger.info(`Price fetched successfully for ${coinId}:`, data);
     res.json({ price: data });
   } catch (error) {
-    console.error(`Error fetching price for ${req.params.id}:`, error);
-    next(error);
+    try {
+      logger.warn(`Using fallback price data for ${req.params.id}`);
+      const fallbackData = await fallbackService.getCoinPrice(req.params.id);
+      res.json({ price: fallbackData });
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch coin price',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
 // Get exchanges
-router.get('/exchanges', async (req, res, next) => {
+router.get('/exchanges', async (req, res) => {
   try {
-    console.log('Fetching exchanges...');
+    logger.info('Fetching exchanges...');
     const data = await coinGeckoService.getExchanges();
-    console.log('Exchanges fetched successfully:', { count: data.length });
+    logger.info('Exchanges fetched successfully:', { count: data.length });
     res.json(data);
   } catch (error) {
-    console.error('Error fetching exchanges:', error);
-    next(error);
+    try {
+      logger.warn('Using fallback exchanges data');
+      const fallbackData = await fallbackService.getExchanges();
+      res.json(fallbackData);
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch exchanges',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
 // Get news
-router.get('/news', async (req, res, next) => {
+router.get('/news', async (req, res) => {
   try {
-    console.log('Fetching crypto news...');
+    logger.info('Fetching crypto news...');
     const data = await coinGeckoService.getNews();
-    console.log('News fetched successfully:', { count: data.length });
+    logger.info('News fetched successfully:', { count: data.length });
     res.json(data);
   } catch (error) {
-    console.error('Error fetching news:', error);
-    next(error);
+    try {
+      logger.warn('Using fallback news data');
+      const fallbackData = await fallbackService.getNews();
+      res.json(fallbackData);
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch news',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
 // Get market sentiment
-router.get('/market-sentiment', async (req, res, next) => {
+router.get('/market-sentiment', async (req, res) => {
   try {
-    console.log('Fetching market sentiment...');
+    logger.info('Fetching market sentiment...');
     const data = await coinGeckoService.getMarketSentiment();
-    console.log('Market sentiment fetched successfully');
+    logger.info('Market sentiment fetched successfully');
     res.json(data);
   } catch (error) {
-    console.error('Error fetching market sentiment:', error);
-    next(error);
+    try {
+      logger.warn('Using fallback market sentiment data');
+      const fallbackData = await fallbackService.getMarketSentiment();
+      res.json(fallbackData);
+    } catch (fallbackError) {
+      logger.error('Fallback data error:', fallbackError);
+      res.status(503).json({
+        error: 'Service Unavailable',
+        message: 'Unable to fetch market sentiment',
+        timestamp: new Date().toISOString()
+      });
+    }
   }
-});
-
-// Error handling middleware
-router.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('API Error:', {
-    path: req.path,
-    method: req.method,
-    error: err.message,
-    stack: err.stack,
-    status: err.status || 500
-  });
-  
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-    status: err.status || 500,
-    timestamp: new Date().toISOString()
-  });
 });
 
 export default router; 

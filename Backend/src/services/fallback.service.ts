@@ -2,9 +2,17 @@ import type { MarketData, GlobalData, TrendingCoin, Exchange, NewsItem, CoinGeck
 import { redisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 
+export interface MarketSentiment {
+  value: string;
+  value_classification: string;
+  timestamp: string;
+  time_until_update: string;
+}
+
 export class FallbackService {
   private static instance: FallbackService;
   private readonly FALLBACK_PREFIX = 'fallback:';
+  private readonly CACHE_TTL = 600; // 10 minutes in seconds
 
   private constructor() {}
 
@@ -121,6 +129,54 @@ export class FallbackService {
       return [];
     }
     return fallbackData;
+  }
+
+  private async getCachedData<T>(key: string): Promise<T | null> {
+    try {
+      const cachedData = await redisClient.get(key);
+      if (cachedData) {
+        return JSON.parse(cachedData);
+      }
+      return null;
+    } catch (error) {
+      logger.error('Redis error:', error);
+      return null;
+    }
+  }
+
+  private async setCachedData<T>(key: string, data: T): Promise<void> {
+    try {
+      await redisClient.setex(key, this.CACHE_TTL, JSON.stringify(data));
+    } catch (error) {
+      logger.error('Redis error:', error);
+    }
+  }
+
+  async getMarketSentiment(): Promise<MarketSentiment> {
+    try {
+      // Try to get from Redis first
+      const cachedData = await this.getCachedData<MarketSentiment>('market-sentiment');
+      if (cachedData) {
+        return cachedData;
+      }
+
+      // If not in Redis, return default fallback data
+      return {
+        value: '50',
+        value_classification: 'Neutral',
+        timestamp: new Date().toISOString(),
+        time_until_update: '1 hour',
+      };
+    } catch (error) {
+      logger.error('Error getting market sentiment fallback:', error);
+      // Return default fallback data if Redis fails
+      return {
+        value: '50',
+        value_classification: 'Neutral',
+        timestamp: new Date().toISOString(),
+        time_until_update: '1 hour',
+      };
+    }
   }
 }
 

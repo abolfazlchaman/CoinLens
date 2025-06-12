@@ -150,7 +150,7 @@ export class CoinGeckoService {
       }
 
       // Try API
-      console.log(`Fetching from CoinGecko API: ${endpoint}`);
+      logger.info(`Fetching from CoinGecko API: ${endpoint}`);
       try {
         const response = await axios.get(`${COINGECKO_API_URL}${endpoint}`, {
           headers: {
@@ -166,18 +166,14 @@ export class CoinGeckoService {
         await fallbackService.updateFallbackData(cacheKey, data);
         return data;
       } catch (apiError: any) {
-        if (apiError.response?.status === 429) {
-          logger.warn('Rate limit hit, using fallback data');
-          const fallback = await fallbackData();
-          return fallback;
-        }
-        throw apiError;
+        logger.warn(`API Error for ${endpoint}:`, apiError);
+        // Always try fallback on any API error
+        const fallback = await fallbackData();
+        return fallback;
       }
     } catch (error) {
-      logger.error(`Error fetching from CoinGecko API (${endpoint}):`, error);
-      
-      // Try fallback
-      logger.info('Using fallback data...');
+      logger.error(`Error in fetchWithFallback for ${endpoint}:`, error);
+      // Always try fallback on any error
       const fallback = await fallbackData();
       return fallback;
     }
@@ -236,10 +232,17 @@ export class CoinGeckoService {
 
   async getCoinPrice(coinId: string): Promise<number> {
     const cacheKey = `coin_price_${coinId}`;
-    const cachedData = await this.getCachedData<number>(cacheKey);
-    if (cachedData) return cachedData;
-
+    
     try {
+      // Try cache first
+      const cachedData = await this.getCachedData<number>(cacheKey);
+      if (cachedData) {
+        // Update fallback data with cached data
+        await fallbackService.updateFallbackData(cacheKey, cachedData);
+        return cachedData;
+      }
+
+      // Try API
       const response = await axios.get(`${COINGECKO_API_URL}/simple/price`, {
         params: {
           ids: coinId,
@@ -248,13 +251,17 @@ export class CoinGeckoService {
       });
       const price = response.data[coinId]?.usd;
       if (price) {
-      await this.setCachedData(cacheKey, price);
-      return price;
+        await this.setCachedData(cacheKey, price);
+        // Update fallback data with fresh API response
+        await fallbackService.updateFallbackData(cacheKey, price);
+        return price;
       }
       throw new Error(`Price not found for ${coinId}`);
-    } catch (error) {
-      logger.error(`Error fetching price for ${coinId}:`, error);
-      throw error;
+    } catch (error: any) {
+      logger.warn(`Error fetching price for ${coinId}:`, error);
+      // Always try fallback on any error
+      const fallbackPrice = await fallbackService.getCoinPrice(coinId);
+      return fallbackPrice;
     }
   }
 
