@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 try {
   console.log('Starting Vercel build script...');
@@ -12,19 +13,25 @@ try {
   fs.mkdirSync(outputDir, { recursive: true });
   fs.mkdirSync(staticDir, { recursive: true });
 
-  // Copy sitemap.xml to static directory
+  // Read and process sitemap.xml
   const sitemapSource = path.join(process.cwd(), 'public', 'sitemap.xml');
-  const sitemapDest = path.join(staticDir, 'sitemap.xml');
-
-  console.log('Checking sitemap source...');
+  console.log('Reading sitemap source...');
   if (!fs.existsSync(sitemapSource)) {
     throw new Error('sitemap.xml not found in public directory');
   }
 
-  console.log('Copying sitemap.xml...');
-  fs.copyFileSync(sitemapSource, sitemapDest);
+  const sitemapContent = fs.readFileSync(sitemapSource, 'utf8');
 
-  // Create config.json with proper headers
+  // Write uncompressed version
+  console.log('Writing uncompressed sitemap.xml...');
+  fs.writeFileSync(path.join(staticDir, 'sitemap.xml'), sitemapContent);
+
+  // Create gzipped version
+  console.log('Creating gzipped version...');
+  const gzippedContent = zlib.gzipSync(sitemapContent);
+  fs.writeFileSync(path.join(staticDir, 'sitemap.xml.gz'), gzippedContent);
+
+  // Create config.json with proper headers for both versions
   const config = {
     version: 3,
     overrides: {
@@ -33,7 +40,16 @@ try {
         headers: {
           'Content-Type': 'application/xml',
           'Cache-Control': 'public, max-age=3600',
-          'Content-Encoding': 'identity',
+          'Content-Length': Buffer.byteLength(sitemapContent).toString(),
+        },
+      },
+      'static/sitemap.xml.gz': {
+        contentType: 'application/gzip',
+        headers: {
+          'Content-Type': 'application/gzip',
+          'Content-Encoding': 'gzip',
+          'Cache-Control': 'public, max-age=3600',
+          'Content-Length': gzippedContent.length.toString(),
         },
       },
     },
