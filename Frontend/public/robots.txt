@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://coinlens.info/sitemap.xml
+Sitemap: https://www.coinlens.info/sitemap.xml

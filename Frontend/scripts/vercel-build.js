@@ -1,25 +1,49 @@
 const fs = require('fs');
 const path = require('path');
 
-// Create .vercel/output/static directory
-const outputDir = path.join(__dirname, '../.vercel/output/static');
-fs.mkdirSync(outputDir, { recursive: true });
+try {
+  console.log('Starting Vercel build script...');
 
-// Copy sitemap.xml to .vercel/output/static/
-const sitemapSource = path.join(__dirname, '../build/sitemap.xml');
-const sitemapDest = path.join(outputDir, 'sitemap.xml');
-fs.copyFileSync(sitemapSource, sitemapDest);
+  // Create output directory
+  const outputDir = path.join(process.cwd(), '.vercel', 'output');
+  const staticDir = path.join(outputDir, 'static');
 
-// Create config.json in .vercel/output/
-const config = {
-  overrides: {
-    'static/sitemap.xml': {
-      contentType: 'application/xml',
+  console.log('Creating output directories...');
+  fs.mkdirSync(outputDir, { recursive: true });
+  fs.mkdirSync(staticDir, { recursive: true });
+
+  // Copy sitemap.xml to static directory
+  const sitemapSource = path.join(process.cwd(), 'public', 'sitemap.xml');
+  const sitemapDest = path.join(staticDir, 'sitemap.xml');
+
+  console.log('Checking sitemap source...');
+  if (!fs.existsSync(sitemapSource)) {
+    throw new Error('sitemap.xml not found in public directory');
+  }
+
+  console.log('Copying sitemap.xml...');
+  fs.copyFileSync(sitemapSource, sitemapDest);
+
+  // Create config.json with proper headers
+  const config = {
+    version: 3,
+    overrides: {
+      'static/sitemap.xml': {
+        contentType: 'application/xml',
+        headers: {
+          'Content-Type': 'application/xml',
+          'Cache-Control': 'public, max-age=3600',
+          'Content-Encoding': 'identity',
+        },
+      },
     },
-  },
-};
+  };
 
-fs.writeFileSync(
-  path.join(__dirname, '../.vercel/output/config.json'),
-  JSON.stringify(config, null, 2),
-);
+  console.log('Writing config.json...');
+  fs.writeFileSync(path.join(outputDir, 'config.json'), JSON.stringify(config, null, 2));
+
+  console.log('Build script completed successfully');
+} catch (error) {
+  console.error('Error in build script:', error);
+  process.exit(1);
+}
