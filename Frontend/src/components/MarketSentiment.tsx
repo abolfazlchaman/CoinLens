@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { cryptoApi } from '../services/cryptoApi';
-import { TrendingUp, TrendingDown, Minus, Bell, Angry, Meh } from 'lucide-react';
+import { TrendingUp, TrendingDown, Bell, Angry, Meh } from 'lucide-react';
 import { Button } from './ui/button';
 import PriceAlerts from './PriceAlerts';
 
-interface MarketSentiment {
+interface MarketSentimentType {
   value: string;
   value_classification: string;
   timestamp: string;
@@ -12,7 +12,7 @@ interface MarketSentiment {
 }
 
 export default function MarketSentiment() {
-  const [sentiment, setSentiment] = useState<MarketSentiment | null>(null);
+  const [sentiment, setSentiment] = useState<MarketSentimentType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPriceAlerts, setShowPriceAlerts] = useState(false);

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ExternalLink, Link, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, ArrowRight } from 'lucide-react';
 import { cryptoApi } from '../services/cryptoApi';
-import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorBoundary } from './ErrorBoundary';
 
 interface NewsItem {
@@ -72,6 +71,7 @@ const newsItems = [
 ];
 
 function CryptoNews() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cryptoApi, TrendingCoin } from '../services/cryptoApi';
+import { cryptoApi } from '../services/cryptoApi';
 import { ExternalLink } from 'lucide-react';
 
 interface TrendingCoinItem {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Twitter, ExternalLink, Mail, LucideIcon, Globe } from 'lucide-react';
+import { Github, Mail, LucideIcon, Globe } from 'lucide-react';
 
 interface BaseLink {
   name: string;

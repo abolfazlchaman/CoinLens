@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { useTheme } from './theme-provider';
-import { useLanguage } from '../contexts/LanguageContext';
 
 const navigation = [
   { name: 'Market Heatmap', href: '#market-heatmap' },
@@ -21,10 +20,10 @@ const footerLinks = [
 ];
 
 export default function Header() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { language, setLanguage } = useLanguage();
   const location = useLocation();
 
   useEffect(() => {
