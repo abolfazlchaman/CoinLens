@@ -1,0 +1,52 @@
+{
+  "name": "CoinLens - Cryptocurrency Market Analytics",
+  "short_name": "CoinLens",
+  "description": "Real-time cryptocurrency market data, price tracking, and market analytics platform",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "categories": ["finance", "cryptocurrency", "trading"],
+  "screenshots": [
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "CoinLens Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Market Overview",
+      "url": "/market",
+      "description": "View cryptocurrency market overview"
+    },
+    {
+      "name": "Portfolio",
+      "url": "/portfolio",
+      "description": "View your cryptocurrency portfolio"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "scope": "/",
+  "dir": "ltr",
+  "lang": "en-US",
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+}

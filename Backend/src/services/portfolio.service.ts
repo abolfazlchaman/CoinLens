@@ -39,7 +39,7 @@ export class PortfolioService {
         name: 'Bitcoin',
         amount: 0.5,
         purchasePrice: 45000,
-        purchaseDate: '2024-01-01T00:00:00.000Z',
+        purchaseDate: '2025-01-01T00:00:00.000Z',
       },
       {
         id: 'ethereum',
@@ -47,7 +47,7 @@ export class PortfolioService {
         name: 'Ethereum',
         amount: 2,
         purchasePrice: 2800,
-        purchaseDate: '2024-02-01T00:00:00.000Z',
+        purchaseDate: '2025-02-01T00:00:00.000Z',
       },
     ];
 

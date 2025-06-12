@@ -1,0 +1,13 @@
+/* TEAM */
+Developer: Abolfazl Chaman
+Contact: https://abolfazlchaman.com
+From: Iran, Shiraz
+
+/* SITE */
+Last update: 2025/06
+Language: English
+Doctype: HTML5
+IDE: Visual Studio Code
+Standards: Redis, HTML5, CSS3, TypeScript
+Components: React, Tailwind CSS, DaisyUI
+API: CoinGecko 
