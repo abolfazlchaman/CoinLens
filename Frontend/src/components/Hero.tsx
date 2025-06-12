@@ -1,7 +1,13 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
-
+import { Button } from './ui/button';
 export default function Hero() {
+  const scrollIntoView = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   return (
     <div className='relative min-h-screen w-full overflow-hidden'>
       {/* Background Image */}
@@ -47,15 +53,15 @@ export default function Hero() {
 
         {/* CTA Buttons */}
         <div className='flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0'>
-          <Link
-            to='#market-heatmap'
-            className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'>
+          <Button
+            onClick={() => scrollIntoView('market-heatmap')}
+            className='inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 min-h-14'>
             Explore Market
             <ArrowRight className='ml-2 h-4 w-4' />
-          </Link>
+          </Button>
           <Link
             to='/about'
-            className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-base font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2'>
+            className='inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-base font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 min-h-14'>
             Learn More
           </Link>
         </div>
